@@ -1,0 +1,1947 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>DAMA code</title>
+    <style>
+        :root {
+            --bg: #f6f7fb;
+            --card: #fff;
+            --tx: #161a2b;
+            --mu: #667;
+            --pr: #5b3df5;
+            --ok: #0a8f4e;
+            --bad: #d1293d;
+            --bd: #e2e4ee;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px)
+        }
+
+        @media(prefers-color-scheme:dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #0f1220;
+                --card: #181c30;
+                --tx: #eef0fa;
+                --mu: #9aa0bd;
+                --pr: #8b73ff;
+                --ok: #38d27f;
+                --bad: #ff6b7d;
+                --bd: #2a2f4a
+            }
+        }
+
+        :root[data-theme="dark"] {
+            --bg: #0f1220;
+            --card: #181c30;
+            --tx: #eef0fa;
+            --mu: #9aa0bd;
+            --pr: #8b73ff;
+            --ok: #38d27f;
+            --bad: #ff6b7d;
+            --bd: #2a2f4a
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--tx);
+            font-family: Tahoma, "Segoe UI", Arial, sans-serif;
+            line-height: 1.8
+        }
+
+        .w {
+            max-width: 720px;
+            margin: auto;
+            padding: 44px 16px 16px
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 26px
+        }
+
+        h1 span {
+            color: var(--pr)
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--bd);
+            border-radius: 14px;
+            padding: 16px;
+            margin: 12px 0
+        }
+
+        button {
+            background: var(--pr);
+            color: #fff;
+            border: 0;
+            border-radius: 10px;
+            padding: 10px 16px;
+            font: inherit;
+            cursor: pointer;
+            margin: 4px 0
+        }
+
+        button.g {
+            background: transparent;
+            color: var(--pr);
+            border: 1px solid var(--pr)
+        }
+
+        button:disabled {
+            opacity: .4
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            background: var(--bg);
+            color: var(--tx);
+            border: 1px solid var(--bd);
+            border-radius: 10px;
+            padding: 10px;
+            font: inherit
+        }
+
+        textarea {
+            min-height: 170px;
+            direction: ltr;
+            text-align: left;
+            font-family: monospace
+        }
+
+        pre {
+            direction: ltr;
+            text-align: left;
+            background: var(--bg);
+            padding: 10px;
+            border-radius: 10px;
+            overflow-x: auto
+        }
+
+        .l {
+            display: block;
+            padding: 10px;
+            border: 1px solid var(--bd);
+            border-radius: 10px;
+            margin: 6px 0;
+            cursor: pointer
+        }
+
+        .l.s {
+            border-color: var(--pr)
+        }
+
+        .ok {
+            color: var(--ok)
+        }
+
+        .bad {
+            color: var(--bad)
+        }
+
+        .mu {
+            color: var(--mu);
+            font-size: 14px
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px
+        }
+
+        .bar {
+            height: 8px;
+            background: var(--bd);
+            border-radius: 9px;
+            overflow: hidden
+        }
+
+        .bar i {
+            display: block;
+            height: 100%;
+            background: var(--pr)
+        }
+
+        .theme-switch {
+            --toggle-size: 11px;
+            --container-width: 5.625em;
+            --container-height: 2.5em;
+            --container-radius: .38em;
+            --container-light-bg: #5caad4;
+            --container-night-bg: #1b1e36;
+            --circle-container-diameter: 3.375em;
+            --sun-moon-diameter: 2.125em;
+            --sun-bg: #f5c518;
+            --moon-bg: #d8d4c0;
+            --spot-color: #9b9787;
+            --circle-container-offset: calc((var(--circle-container-diameter) - var(--container-height))/2*-1);
+            --stars-color: #fff8e1;
+            --clouds-color: #f4f4f4;
+            --back-clouds-color: #bacfe0;
+            --transition: .5s cubic-bezier(0, -.02, .4, 1.25);
+            --circle-transition: .3s cubic-bezier(0, -.02, .35, 1.17);
+            display: inline-block;
+            direction: ltr;
+            position: fixed;
+            top: calc(12px + env(safe-area-inset-top, 0px));
+            left: 14px;
+            z-index: 9
+        }
+
+        .theme-switch,
+        .theme-switch *,
+        .theme-switch *::before,
+        .theme-switch *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-size: var(--toggle-size)
+        }
+
+        .theme-switch__container {
+            width: var(--container-width);
+            height: var(--container-height);
+            background-color: var(--container-light-bg);
+            border-radius: var(--container-radius);
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            background-image: linear-gradient(to bottom, var(--container-light-bg) 0%, #4a92bd 100%);
+            transition: all var(--transition);
+            box-shadow: 0 0 0 2.5px #1a1a1a, 3px 4px 0 2.5px rgba(26, 26, 26, .22);
+            transform: rotate(-.7deg);
+            filter: url(#sketchy)
+        }
+
+        .theme-switch__container::before {
+            content: "";
+            position: absolute;
+            z-index: 1;
+            inset: 0;
+            background-image: repeating-linear-gradient(-50deg, transparent, transparent 7px, rgba(255, 255, 255, .04) 7px, rgba(255, 255, 255, .04) 8px);
+            border-radius: inherit;
+            pointer-events: none
+        }
+
+        .theme-switch__checkbox {
+            display: none
+        }
+
+        .theme-switch__circle-container {
+            width: var(--circle-container-diameter);
+            height: var(--circle-container-diameter);
+            background-color: rgba(255, 255, 255, .1);
+            position: absolute;
+            left: var(--circle-container-offset);
+            top: var(--circle-container-offset);
+            border-radius: var(--container-radius);
+            box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, .1), inset 0 0 0 3.375em rgba(255, 255, 255, .1), 0 0 0 .625em rgba(255, 255, 255, .1), 0 0 0 1.25em rgba(255, 255, 255, .1);
+            display: flex;
+            transition: var(--circle-transition);
+            pointer-events: none
+        }
+
+        .theme-switch__circle-container::before {
+            content: "";
+            position: absolute;
+            width: calc(var(--circle-container-diameter) + 1.5em);
+            height: calc(var(--circle-container-diameter) + 1.5em);
+            left: -.75em;
+            top: -.75em;
+            border-radius: 50%;
+            background: conic-gradient(transparent 0deg, transparent 8deg, rgba(245, 197, 24, .52) 8deg, rgba(245, 197, 24, .52) 22deg, transparent 22deg, transparent 53deg, rgba(245, 197, 24, .52) 53deg, rgba(245, 197, 24, .52) 67deg, transparent 67deg, transparent 98deg, rgba(245, 197, 24, .52) 98deg, rgba(245, 197, 24, .52) 112deg, transparent 112deg, transparent 143deg, rgba(245, 197, 24, .52) 143deg, rgba(245, 197, 24, .52) 157deg, transparent 157deg, transparent 188deg, rgba(245, 197, 24, .52) 188deg, rgba(245, 197, 24, .52) 202deg, transparent 202deg, transparent 233deg, rgba(245, 197, 24, .52) 233deg, rgba(245, 197, 24, .52) 247deg, transparent 247deg, transparent 278deg, rgba(245, 197, 24, .52) 278deg, rgba(245, 197, 24, .52) 292deg, transparent 292deg, transparent 323deg, rgba(245, 197, 24, .52) 323deg, rgba(245, 197, 24, .52) 337deg, transparent 337deg, transparent 368deg, rgba(245, 197, 24, .52) 368deg, rgba(245, 197, 24, .52) 382deg, transparent 382deg, transparent 413deg, rgba(245, 197, 24, .52) 413deg, rgba(245, 197, 24, .52) 427deg, transparent 360deg);
+            animation: rotateSunRays 14s linear infinite;
+            opacity: 1;
+            transition: opacity var(--transition);
+            pointer-events: none;
+            filter: url(#sketchy-sm)
+        }
+
+        .theme-switch__checkbox:checked+.theme-switch__container .theme-switch__circle-container::before {
+            opacity: 0
+        }
+
+        @keyframes rotateSunRays {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .theme-switch__sun-moon-container {
+            pointer-events: auto;
+            position: relative;
+            z-index: 2;
+            width: var(--sun-moon-diameter);
+            height: var(--sun-moon-diameter);
+            margin: auto;
+            border-radius: var(--container-radius);
+            background-color: var(--sun-bg);
+            box-shadow: .062em .062em .062em 0 rgba(254, 255, 239, .61) inset, 0 -.062em .062em 0 #a1872a inset, .1em .13em 0 .04em #1a1a1a;
+            filter: url(#sketchy-sm) drop-shadow(.062em .125em .125em rgba(0, 0, 0, .25)) drop-shadow(0 .062em .125em rgba(0, 0, 0, .25));
+            overflow: hidden;
+            transition: var(--transition);
+            transform: scale(1)
+        }
+
+        .theme-switch__sun-moon-container:hover {
+            transform: scale(1.1) rotate(5deg)
+        }
+
+        .theme-switch__moon {
+            transform: translateX(100%);
+            width: 100%;
+            height: 100%;
+            background-color: var(--moon-bg);
+            border-radius: inherit;
+            box-shadow: .062em .062em .062em 0 rgba(254, 255, 239, .61) inset, 0 -.062em .062em 0 #969696 inset;
+            transition: all var(--transition), transform .3s ease;
+            position: relative
+        }
+
+        .theme-switch__moon:hover {
+            transform: rotate(15deg)
+        }
+
+        .theme-switch__spot {
+            position: absolute;
+            top: .75em;
+            left: .312em;
+            width: .75em;
+            height: .75em;
+            border-radius: var(--container-radius);
+            background-color: var(--spot-color);
+            box-shadow: 0 .0312em .062em rgba(0, 0, 0, .25) inset;
+            transition: background-color .3s ease;
+            filter: url(#sketchy-sm)
+        }
+
+        .theme-switch__spot:nth-of-type(2) {
+            width: .375em;
+            height: .375em;
+            top: .937em;
+            left: 1.375em
+        }
+
+        .theme-switch__spot:nth-last-of-type(3) {
+            width: .25em;
+            height: .25em;
+            top: .312em;
+            left: .812em
+        }
+
+        .theme-switch__moon:hover .theme-switch__spot {
+            background-color: #7a7f8c
+        }
+
+        .theme-switch__clouds {
+            width: 1.25em;
+            height: 1.25em;
+            background-color: var(--clouds-color);
+            border-radius: var(--container-radius);
+            position: absolute;
+            bottom: -.625em;
+            left: .312em;
+            box-shadow: .937em .312em var(--clouds-color), -.312em -.312em var(--back-clouds-color), 1.437em .375em var(--clouds-color), .5em -.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -.062em var(--back-clouds-color), 2.937em .312em var(--clouds-color), 2em -.312em var(--back-clouds-color), 3.625em -.062em var(--clouds-color), 2.625em 0 var(--back-clouds-color), 4.5em -.312em var(--clouds-color), 3.375em -.437em var(--back-clouds-color), 4.625em -1.75em 0 .437em var(--clouds-color), 4em -.625em var(--back-clouds-color), 4.125em -2.125em 0 .437em var(--back-clouds-color);
+            transition: .5s cubic-bezier(0, -.02, .4, 1.25);
+            filter: url(#sketchy-sm)
+        }
+
+        .theme-switch__stars-container {
+            position: absolute;
+            color: var(--stars-color);
+            top: -100%;
+            left: .312em;
+            width: 2.75em;
+            height: auto;
+            transition: var(--transition)
+        }
+
+        .theme-switch__checkbox:checked+.theme-switch__container {
+            background-color: var(--container-night-bg);
+            background-image: linear-gradient(to bottom, var(--container-night-bg) 0%, #252a4a 100%)
+        }
+
+        .theme-switch__checkbox:checked+.theme-switch__container .theme-switch__circle-container {
+            left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter))
+        }
+
+        .theme-switch__checkbox:checked+.theme-switch__container .theme-switch__circle-container:hover {
+            left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter) - .187em)
+        }
+
+        .theme-switch__circle-container:hover {
+            left: calc(var(--circle-container-offset) + .187em)
+        }
+
+        .theme-switch__checkbox:checked+.theme-switch__container .theme-switch__moon {
+            transform: translate(0)
+        }
+
+        .theme-switch__checkbox:checked+.theme-switch__container .theme-switch__clouds {
+            bottom: -4.062em
+        }
+
+        .theme-switch__checkbox:checked+.theme-switch__container .theme-switch__stars-container {
+            top: 50%;
+            transform: translateY(-50%)
+        }
+
+        .theme-switch__container:hover .theme-switch__clouds {
+            transform: translateX(15px) scale(1.02)
+        }
+
+        .theme-switch__sun-moon-container::after {
+            content: "";
+            position: absolute;
+            inset: -5px;
+            background: radial-gradient(circle, rgba(255, 255, 255, .2) 0%, transparent 70%);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity .3s ease
+        }
+
+        .theme-switch__sun-moon-container:hover::after {
+            opacity: 1
+        }
+
+        .theme-switch__shooting-star,
+        .theme-switch__shooting-star-2,
+        .theme-switch__meteor {
+            position: absolute;
+            background: #fff;
+            opacity: 0;
+            transition: opacity .3s ease;
+            left: -10%
+        }
+
+        .theme-switch__shooting-star {
+            width: 2px;
+            height: 2px;
+            top: 20%
+        }
+
+        .theme-switch__shooting-star-2 {
+            width: 1px;
+            height: 1px;
+            top: 35%
+        }
+
+        .theme-switch__meteor {
+            width: 3px;
+            height: 3px;
+            background: gold;
+            border-radius: 50%;
+            top: -10%;
+            left: 50%;
+            filter: blur(1px)
+        }
+
+        .theme-switch__checkbox:checked+.theme-switch__container .theme-switch__shooting-star {
+            animation: shootingStar 2s linear infinite;
+            opacity: 1
+        }
+
+        .theme-switch__checkbox:checked+.theme-switch__container .theme-switch__shooting-star-2 {
+            animation: shootingStar 3s linear infinite 1s;
+            opacity: 1
+        }
+
+        .theme-switch__checkbox:checked+.theme-switch__container .theme-switch__meteor {
+            animation: meteor 4s linear infinite 2s;
+            opacity: 1
+        }
+
+        @keyframes shootingStar {
+            0% {
+                transform: translate(0, 0) rotate(45deg);
+                opacity: 1
+            }
+
+            100% {
+                transform: translate(150px, 150px) rotate(45deg);
+                opacity: 0
+            }
+        }
+
+        @keyframes meteor {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1
+            }
+
+            100% {
+                transform: translateY(150px) scale(.3);
+                opacity: 0
+            }
+        }
+
+        .theme-switch__stars-cluster {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity .3s ease
+        }
+
+        .theme-switch__stars-cluster .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 4px 1px #fff
+        }
+
+        .theme-switch__stars-cluster .star:nth-child(1) {
+            top: 20%;
+            left: 20%;
+            animation: twinkle 1s infinite ease-in-out
+        }
+
+        .theme-switch__stars-cluster .star:nth-child(2) {
+            top: 30%;
+            left: 55%;
+            animation: twinkle 1s infinite ease-in-out .3s
+        }
+
+        .theme-switch__stars-cluster .star:nth-child(3) {
+            top: 40%;
+            left: 80%;
+            animation: twinkle 1s infinite ease-in-out .6s
+        }
+
+        .theme-switch__stars-cluster .star:nth-child(4) {
+            top: 60%;
+            left: 30%;
+            animation: twinkle 1s infinite ease-in-out .9s
+        }
+
+        .theme-switch__stars-cluster .star:nth-child(5) {
+            top: 70%;
+            left: 65%;
+            animation: twinkle 1s infinite ease-in-out 1.2s
+        }
+
+        .theme-switch__aurora {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(90deg, rgba(0, 255, 255, 0) 0%, rgba(0, 255, 255, .2) 25%, rgba(128, 0, 255, .2) 50%, rgba(0, 255, 255, .2) 75%, rgba(0, 255, 255, 0) 100%);
+            opacity: 0;
+            filter: blur(4px);
+            transform: translateY(-100%);
+            transition: opacity .3s ease
+        }
+
+        .theme-switch__comets {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity .3s ease
+        }
+
+        .theme-switch__comets .comet {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(90deg, #fff 0%, transparent 90%);
+            border-radius: 50%;
+            filter: blur(1px);
+            left: -10%
+        }
+
+        .theme-switch__comets .comet:nth-child(1) {
+            top: 30%;
+            animation: cometMove 4s linear infinite
+        }
+
+        .theme-switch__comets .comet:nth-child(2) {
+            top: 50%;
+            animation: cometMove 6s linear infinite 2s
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: .3;
+                transform: scale(1)
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2)
+            }
+        }
+
+        @keyframes cometMove {
+            0% {
+                transform: translate(0, 0) rotate(-45deg) scale(1);
+                opacity: 0
+            }
+
+            10%,
+            90% {
+                opacity: 1
+            }
+
+            100% {
+                transform: translate(200px, 200px) rotate(-45deg) scale(.2);
+                opacity: 0
+            }
+        }
+
+        .theme-switch__checkbox:checked+.theme-switch__container .theme-switch__stars-cluster,
+        .theme-switch__checkbox:checked+.theme-switch__container .theme-switch__comets {
+            opacity: 1
+        }
+
+        .theme-switch__checkbox:checked+.theme-switch__container .theme-switch__aurora {
+            opacity: 1;
+            animation: auroraWave 8s linear infinite
+        }
+
+        @keyframes auroraWave {
+            0% {
+                transform: translateY(-100%) translateX(-50%)
+            }
+
+            100% {
+                transform: translateY(-100%) translateX(50%)
+            }
+        }
+
+        button.fx {
+            position: relative;
+            width: 11em;
+            height: 4em;
+            outline: none;
+            transition: .1s;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            margin: 14px 8px;
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--tx);
+            direction: ltr;
+            cursor: pointer
+        }
+
+        .fx:disabled {
+            pointer-events: none;
+            opacity: .4
+        }
+
+        .fx .clip {
+            --color: #2761c3;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            border: 5px double var(--color);
+            box-shadow: inset 0 0 15px #195480;
+            -webkit-clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+            clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)
+        }
+
+        .fx .arrow {
+            position: absolute;
+            transition: .2s;
+            background-color: #2761c3;
+            top: 35%;
+            width: 11%;
+            height: 30%
+        }
+
+        .fx .lA {
+            left: -13.5%;
+            -webkit-clip-path: polygon(100% 0, 100% 100%, 0 50%);
+            clip-path: polygon(100% 0, 100% 100%, 0 50%)
+        }
+
+        .fx .rA {
+            -webkit-clip-path: polygon(100% 49%, 0 0, 0 100%);
+            clip-path: polygon(100% 49%, 0 0, 0 100%);
+            left: 102%
+        }
+
+        .fx:hover .rA {
+            background-color: #27c39f;
+            left: -15%;
+            animation: .6s ease-in-out both infinite alternate rightArrow8
+        }
+
+        .fx:hover .lA {
+            background-color: #27c39f;
+            left: 103%;
+            animation: .6s ease-in-out both infinite alternate leftArrow8
+        }
+
+        .fx .corner {
+            position: absolute;
+            width: 4em;
+            height: 4em;
+            background-color: #2761c3;
+            box-shadow: inset 1px 1px 8px #2781c3;
+            transform: scale(1) rotate(45deg);
+            transition: .2s
+        }
+
+        .fx .rT {
+            top: -1.98em;
+            left: 91%
+        }
+
+        .fx .lT {
+            top: -1.96em;
+            left: -3em
+        }
+
+        .fx .lB {
+            top: 2.1em;
+            left: -2.15em
+        }
+
+        .fx .rB {
+            top: 45%;
+            left: 88%
+        }
+
+        .fx:hover .lT {
+            animation: .1s ease-in-out .05s both changeColor8, .2s linear .4s both lightEffect8
+        }
+
+        .fx:hover .rT {
+            animation: .1s ease-in-out .15s both changeColor8, .2s linear .4s both lightEffect8
+        }
+
+        .fx:hover .rB {
+            animation: .1s ease-in-out .25s both changeColor8, .2s linear .4s both lightEffect8
+        }
+
+        .fx:hover .lB {
+            animation: .1s ease-in-out .35s both changeColor8, .2s linear .4s both lightEffect8
+        }
+
+        .fx:hover .corner {
+            transform: scale(1.25) rotate(45deg)
+        }
+
+        .fx:hover .clip {
+            animation: .2s ease-in-out .55s both greenLight8;
+            --color: #27c39f
+        }
+
+        @keyframes changeColor8 {
+            from {
+                background-color: #2781c3
+            }
+
+            to {
+                background-color: #27c39f
+            }
+        }
+
+        @keyframes lightEffect8 {
+            from {
+                box-shadow: 1px 1px 5px #27c39f
+            }
+
+            to {
+                box-shadow: 0 0 2px #27c39f
+            }
+        }
+
+        @keyframes greenLight8 {
+            to {
+                box-shadow: inset 0 0 32px #27c39f
+            }
+        }
+
+        @keyframes leftArrow8 {
+            from {
+                transform: translate(0)
+            }
+
+            to {
+                transform: translateX(10px)
+            }
+        }
+
+        @keyframes rightArrow8 {
+            from {
+                transform: translate(0)
+            }
+
+            to {
+                transform: translateX(-10px)
+            }
+        }
+
+        .input-container {
+            position: relative;
+            width: 100%;
+            max-width: 270px;
+            margin: 14px 12px 22px 0
+        }
+
+        .input-container::after {
+            content: "|";
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #000;
+            animation: blink .7s step-end infinite;
+            pointer-events: none
+        }
+
+        .input {
+            width: 100%;
+            max-width: 270px;
+            height: 60px;
+            padding: 12px;
+            font-size: 18px;
+            font-family: "Courier New", monospace;
+            color: #000;
+            background-color: #fff;
+            border: 4px solid #000;
+            border-radius: 0;
+            outline: none;
+            transition: all .3s ease;
+            box-shadow: 8px 8px 0 #000
+        }
+
+        .input::placeholder {
+            color: #888
+        }
+
+        .input:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0 #000
+        }
+
+        .input:focus {
+            background-color: #010101;
+            color: #fff;
+            border-color: #d6d9dd;
+            animation: shake .5s ease-in-out
+        }
+
+        .input:focus::placeholder {
+            color: #fff
+        }
+
+        .input:not(:placeholder-shown) {
+            animation: glitch 1s linear infinite;
+            font-weight: bold;
+            letter-spacing: 1px
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translateX(0)
+            }
+
+            25% {
+                transform: translateX(-5px) rotate(-5deg)
+            }
+
+            50% {
+                transform: translateX(5px) rotate(5deg)
+            }
+
+            75% {
+                transform: translateX(-5px) rotate(-5deg)
+            }
+
+            100% {
+                transform: translateX(0)
+            }
+        }
+
+        @keyframes glitch {
+
+            0%,
+            10%,
+            27%,
+            35%,
+            50%,
+            52%,
+            72%,
+            80%,
+            100% {
+                transform: none;
+                opacity: 1
+            }
+
+            7% {
+                transform: skew(-.5deg, -.9deg);
+                opacity: .75
+            }
+
+            30% {
+                transform: skew(.8deg, -.1deg);
+                opacity: .75
+            }
+
+            55% {
+                transform: skew(-1deg, .2deg);
+                opacity: .75
+            }
+
+            75% {
+                transform: skew(.4deg, 1deg);
+                opacity: .75
+            }
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0
+            }
+        }
+
+        body {
+            overflow-x: hidden
+        }
+
+        .wt-wrap {
+            position: relative;
+            height: 64px
+        }
+
+        .water-toggle {
+            display: inline-block;
+            position: absolute;
+            right: 14px;
+            top: 10px
+        }
+
+        .water-toggle input#toggle-wave {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 3;
+            padding: 0;
+            border: 0
+        }
+
+        .water-toggle .container {
+            margin: -1rem;
+            padding: 1rem;
+            position: relative;
+            z-index: 1;
+            filter: url(#still-water);
+            animation: wave 10s infinite ease-in-out;
+            transition: 1s;
+            display: block
+        }
+
+        .water-toggle:hover .container {
+            filter: url(#water-rotate);
+            transition: .5s;
+            animation: wave 8s infinite ease-in-out
+        }
+
+        input#toggle-wave:checked~.container {
+            animation: beeg-wave 3.5s infinite ease-in-out;
+            scale: .75
+        }
+
+        .water-button {
+            position: relative;
+            z-index: 5;
+            font-size: 1rem;
+            padding: .65em 1.5em;
+            margin: 0;
+            border: none;
+            border-radius: 50em;
+            background: #13b0ff26;
+            outline: 3px solid #3f545f55;
+            color: var(--tx);
+            text-shadow: 0 0 8px #79a5adda;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: Tahoma, sans-serif;
+            translate: 10px;
+            transition: 1s;
+            box-shadow: inset 2px 3px 4px #d4f7fe25
+        }
+
+        .water-toggle:hover .water-button {
+            text-shadow: 0 0 12px #49e1ffda;
+            background: #13b0ff3d;
+            outline-color: #00aaff00;
+            padding: .9em 1.5em;
+            box-shadow: inset 0 0 8px #7ae9ff25, 0 0 40px #39d9f96f
+        }
+
+        input#toggle-wave:checked~.container .water-button {
+            text-shadow: 0 0 48px #7ae9ff, 0 0 12px #7ae9ff, 0 0 12px #7ae9ff, 0 0 64px #39d9f9;
+            box-shadow: inset 0 0 12px #7ae9ff46, inset 0 0 8px #7ae9ff25, 0 0 8px #7ae9ff84, 0 0 64px #39d9f96f;
+            padding: .65em 1.5em;
+            transition: 1s
+        }
+
+        @keyframes wave {
+
+            0%,
+            100% {
+                padding: 1rem;
+                margin: -1rem
+            }
+
+            50% {
+                padding: 10rem;
+                margin: -10rem
+            }
+        }
+
+        @keyframes beeg-wave {
+
+            0%,
+            100% {
+                padding: 1rem;
+                margin: -1rem
+            }
+
+            50% {
+                padding: 12rem;
+                margin: -12rem
+            }
+        }
+
+        .water-toggle,
+        .water-toggle * {
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+            -webkit-user-select: none;
+            user-select: none
+        }
+
+        .water-toggle input:focus,
+        .water-toggle input:active {
+            outline: none;
+            box-shadow: none;
+            background: transparent
+        }
+
+        .water-toggle .water-button {
+            outline: 3px solid #3f545f55
+        }
+
+        .tb {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin: 8px 0
+        }
+
+        .tb td {
+            border: 1px solid var(--bd);
+            padding: 6px 8px;
+            vertical-align: top
+        }
+
+        .tb td:first-child {
+            white-space: nowrap;
+            width: 1%;
+            background: var(--bg)
+        }
+
+        .ex {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            border-right: 5px solid var(--c);
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin: 8px 0
+        }
+
+        .ex code {
+            align-self: flex-start;
+            background: var(--c);
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 8px;
+            font-weight: bold
+        }
+
+        .c0 {
+            --c: #e0457b
+        }
+
+        .c1 {
+            --c: #2f80ed
+        }
+
+        .c2 {
+            --c: #0fa968
+        }
+
+        .c3 {
+            --c: #e58a00
+        }
+
+        .c4 {
+            --c: #8b5cf6
+        }
+
+        .c5 {
+            --c: #d6453d
+        }
+
+        .tip {
+            white-space: pre-wrap;
+            unicode-bidi: plaintext;
+            background: rgba(91, 61, 245, .12);
+            border: 1px dashed var(--pr);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin: 10px 0
+        }
+
+        .hdemo {
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin: 8px 0
+        }
+
+        .hdemo h1 {
+            font-size: 2em;
+            margin: 4px 0
+        }
+
+        .hdemo h2,
+        .hdemo h3,
+        .hdemo h4,
+        .hdemo h5,
+        .hdemo h6 {
+            margin: 4px 0
+        }
+    </style>
+</head>
+
+<body><svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+        <defs>
+            <filter id="sketchy" x="-10%" y="-10%" width="120%" height="120%">
+                <feTurbulence type="turbulence" baseFrequency="0.035 0.042" numOctaves="4" result="noise" seed="42"></feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="4.5" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+            </filter>
+            <filter id="sketchy-sm" x="-18%" y="-18%" width="136%" height="136%">
+                <feTurbulence type="turbulence" baseFrequency="0.06" numOctaves="3" result="noise" seed="7"></feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+            </filter>
+        </defs>
+    </svg>
+    <label class="theme-switch" id="tg" title="Light / Dark"><input class="theme-switch__checkbox" id="tgc" type="checkbox" onchange="tgl(this)">
+        <div class="theme-switch__container">
+            <div class="theme-switch__clouds"></div>
+            <div class="theme-switch__stars-container"><svg fill="none" viewBox="0 0 144 55" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="currentColor" d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z" clip-rule="evenodd" fill-rule="evenodd"></path>
+                </svg></div>
+            <div class="theme-switch__circle-container">
+                <div class="theme-switch__sun-moon-container">
+                    <div class="theme-switch__moon">
+                        <div class="theme-switch__spot"></div>
+                        <div class="theme-switch__spot"></div>
+                        <div class="theme-switch__spot"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="theme-switch__shooting-star"></div>
+            <div class="theme-switch__shooting-star-2"></div>
+            <div class="theme-switch__meteor"></div>
+            <div class="theme-switch__stars-cluster">
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+            </div>
+            <div class="theme-switch__aurora"></div>
+            <div class="theme-switch__comets">
+                <div class="comet"></div>
+                <div class="comet"></div>
+            </div>
+        </div>
+    </label>
+    <div class="w" id="app"></div>
+    <script>
+        const PH = "201094393622",
+            PASS = 85;
+        const L = [{
+                t: "ما هي البرمجة؟",
+                x: `<p>البرمجة هي كتابة تعليمات يفهمها الحاسوب لينفّذ مهمة معيّنة، والكمبيوتر ينفّذ الأوامر <b>بالترتيب</b> وبالحرف. سنستخدم لغة JavaScript لأنها تعمل في أي متصفح.</p><p>أمر الطباعة:</p><pre>console.log("مرحبا");</pre><p>كل أمر ينتهي بفاصلة منقوطة <code>;</code>، والنص يُكتب بين علامتي تنصيص.</p>`,
+                q: [
+                    ["ماذا يفعل الحاسوب بالأوامر؟", ["ينفذها بالترتيب", "يخمّن ما نقصد", "ينفذها عشوائيا"], 0],
+                    ["أي أمر يطبع نصا في JavaScript؟", ["print()", "console.log()", "echo()"], 1],
+                    ["النص يُكتب بين:", ["علامتي تنصيص", "أقواس مربعة", "لا يحتاج علامات"], 0]
+                ],
+                p: "اطبع 3 أسطر باستخدام console.log: اسمك، بلدك، وجملة «أنا أتعلم البرمجة».",
+                c: [
+                    ["3 أوامر console.log على الأقل", /(console\.log[\s\S]*){3}/],
+                    ["نص بين تنصيص", /console\.log\(\s*["'`][^"'`]+["'`]\s*\)/],
+                    ["فاصلة منقوطة في النهاية", /\);/]
+                ]
+            },
+            {
+                t: "المتغيرات",
+                x: `<p>المتغير صندوق بإسم نخزن فيه قيمة. نستخدم <code>let</code> للقيمة التي قد تتغير و<code>const</code> للثابتة.</p><pre>let age = 20;\nconst name = "Ali";\nconsole.log(name + " " + age);</pre>`,
+                q: [
+                    ["أي كلمة تعرّف متغيرا ثابتا؟", ["let", "const", "var2"], 1],
+                    ["ما ناتج: let a=5; a=8; console.log(a)؟", ["5", "8", "13"], 1],
+                    ["المتغير هو:", ["مكان لتخزين قيمة", "نوع من الأخطاء", "أمر طباعة"], 0]
+                ],
+                p: "عرّف متغيرين name و age، ثم اطبعهما معا في سطر واحد.",
+                c: [
+                    ["متغيران على الأقل (let/const)", /(?:let|const)\s+\w+[\s\S]*(?:let|const)\s+\w+/],
+                    ["متغير باسم name", /(?:let|const)\s+name\b/],
+                    ["متغير باسم age", /(?:let|const)\s+age\b/],
+                    ["طباعة باستخدام console.log و + أو ${}", /console\.log\([^)]*(\+|\$\{)/]
+                ]
+            },
+            {
+                t: "أنواع البيانات",
+                x: `<p>الأنواع الأساسية: نص <code>"Ali"</code>، رقم <code>25</code>، وقيمة منطقية <code>true/false</code>. ونعرف النوع بـ <code>typeof</code>.</p><pre>console.log(typeof "hi"); // string</pre>`,
+                q: [
+                    ["نوع القيمة true:", ["string", "boolean", "number"], 1],
+                    ["نوع القيمة \"10\":", ["number", "string", "boolean"], 1],
+                    ["أي أمر يكشف النوع؟", ["typeof", "type()", "kind"], 0]
+                ],
+                p: "عرّف متغيرا نصيا ورقميا ومنطقيا، واطبع نوع كل منها بـ typeof.",
+                c: [
+                    ["3 استخدامات لـ typeof", /(typeof[\s\S]*){3}/],
+                    ["قيمة true أو false", /\b(true|false)\b/],
+                    ["قيمة نصية", /=\s*["'`][^"'`]*["'`]/],
+                    ["قيمة رقمية", /=\s*\d+/]
+                ]
+            },
+            {
+                t: "الشروط if / else",
+                x: `<p>الشرط يجعل البرنامج يختار قرارا:</p><pre>if (age >= 18) {\n  console.log("adult");\n} else {\n  console.log("minor");\n}</pre>`,
+                q: [
+                    ["أي عامل يعني «أكبر من أو يساوي»؟", [">=", "=>", "=="], 0],
+                    ["متى يُنفَّذ else؟", ["عندما يكون الشرط خاطئا", "دائما", "عندما يكون الشرط صحيحا"], 0],
+                    ["الشرط يُكتب بعد:", ["if", "for", "let"], 0]
+                ],
+                p: "اكتب برنامجا يفحص متغير age: إن كان 18 أو أكثر يطبع «بالغ» وإلا يطبع «قاصر».",
+                c: [
+                    ["استخدام if", /\bif\s*\(/],
+                    ["استخدام else", /\belse\b/],
+                    ["مقارنة >= أو >", />=?/],
+                    ["طباعتان console.log", /(console\.log[\s\S]*){2}/]
+                ]
+            },
+            {
+                t: "الحلقات",
+                x: `<p>الحلقة تكرر أمرا دون تكرار كتابته:</p><pre>for (let i = 1; i <= 5; i++) {\n  console.log(i);\n}</pre><p>ثلاثة أجزاء: البداية، الشرط، الزيادة.</p>`,
+                q: [
+                    ["ماذا يفعل i++؟", ["يزيد i بواحد", "ينقص i", "يطبع i"], 0],
+                    ["كم مرة تدور: for(let i=0;i<3;i++)؟", ["2", "3", "4"], 1],
+                    ["نستخدم الحلقة من أجل:", ["تكرار أمر", "تعريف نص", "حذف متغير"], 0]
+                ],
+                p: "اطبع الأرقام من 1 إلى 10 باستخدام حلقة for.",
+                c: [
+                    ["حلقة for", /for\s*\(/],
+                    ["شرط <= أو <", /<=?\s*\d+/],
+                    ["زيادة ++ أو +=", /\+\+|\+=/],
+                    ["console.log داخل الحلقة", /\{[\s\S]*console\.log[\s\S]*\}/]
+                ]
+            },
+            {
+                t: "الدوال",
+                x: `<p>الدالة مجموعة أوامر لها اسم نستدعيها متى شئنا، وقد ترجع قيمة بـ <code>return</code>:</p><pre>function add(a, b) {\n  return a + b;\n}\nconsole.log(add(2, 3));</pre>`,
+                q: [
+                    ["أي كلمة تعرّف دالة؟", ["function", "def2", "fun()"], 0],
+                    ["ماذا يفعل return؟", ["يُرجع قيمة", "يطبع نصا", "يكرر الأمر"], 0],
+                    ["كيف نستدعي الدالة add؟", ["add(2,3)", "call add", "add[2,3]"], 0]
+                ],
+                p: "اكتب دالة multiply تأخذ رقمين وترجع حاصل ضربهما، ثم استدعها واطبع النتيجة.",
+                c: [
+                    ["تعريف function باسم multiply", /function\s+multiply\s*\(\s*\w+\s*,\s*\w+\s*\)/],
+                    ["استخدام return", /\breturn\b/],
+                    ["عملية ضرب *", /\*/],
+                    ["استدعاء داخل console.log", /console\.log\(\s*multiply\s*\(/]
+                ]
+            },
+            {
+                t: "المصفوفات",
+                x: `<p>المصفوفة قائمة من القيم داخل متغير واحد. الترتيب يبدأ من <b>0</b>:</p><pre>const fruits = ["apple", "banana"];\nconsole.log(fruits[0]);     // apple\nconsole.log(fruits.length); // 2\nfruits.push("mango");</pre>`,
+                q: [
+                    ["أول عنصر في المصفوفة رقمه:", ["0", "1", "-1"], 0],
+                    ["ماذا تفعل push؟", ["تضيف عنصرا في النهاية", "تحذف عنصرا", "تعكس المصفوفة"], 0],
+                    ["كيف نعرف عدد العناصر؟", [".length", ".count()", ".size"], 0]
+                ],
+                p: "أنشئ مصفوفة من 4 أسماء، اطبع أول اسم وعدد العناصر، ثم أضف اسما جديدا بـ push واطبع العدد مرة أخرى.",
+                c: [
+                    ["مصفوفة بـ 4 عناصر", /\[[^\],]+(,[^\],]+){3}\]/],
+                    ["الوصول لعنصر برقمه [0]", /\w+\[0\]/],
+                    ["استخدام .length مرتين", /\.length[\s\S]*\.length/],
+                    ["استخدام .push(", /\.push\(/]
+                ]
+            },
+            {
+                t: "الكائنات Objects",
+                x: `<p>الكائن يجمع بيانات مرتبطة بأسماء (مفتاح: قيمة):</p><pre>const student = { name: "Ali", age: 20 };\nconsole.log(student.name);\nstudent.city = "Cairo";</pre>`,
+                q: [
+                    ["الكائن يُكتب بين:", ["{ }", "[ ]", "( )"], 0],
+                    ["كيف نقرأ الخاصية name من student؟", ["student.name", "student(name)", "student->name"], 0],
+                    ["student.city = \"Cairo\" تقوم بـ:", ["إضافة أو تعديل خاصية", "حذف الكائن", "طباعة المدينة"], 0]
+                ],
+                p: "أنشئ كائن student فيه name و age و city، اطبع خاصيتين منه، ثم أضف خاصية جديدة اسمها grade.",
+                c: [
+                    ["كائن student بثلاث خصائص", /student\s*=\s*\{[^}]*:[^}]*:[^}]*:[^}]*\}/],
+                    ["قراءة خاصيتين بالنقطة", /student\.\w+[\s\S]*student\.\w+/],
+                    ["إضافة خاصية grade", /student\.grade\s*=/],
+                    ["console.log", /console\.log/]
+                ]
+            },
+            {
+                t: "العوامل الحسابية والمنطقية",
+                x: `<p>الحساب: <code>+ - * /</code> والباقي <code>%</code>. المنطق: <code>&amp;&amp;</code> (و) و <code>||</code> (أو) و <code>!</code> (ليس).</p><pre>console.log(10 % 3);        // 1\nif (age > 18 &amp;&amp; hasId) { }</pre>`,
+                q: [
+                    ["ناتج 10 % 3:", ["1", "3", "0"], 0],
+                    ["&& تعني:", ["و (كلا الشرطين)", "أو", "ليس"], 0],
+                    ["true || false يساوي:", ["true", "false", "خطأ"], 0]
+                ],
+                p: "اكتب برنامجا يطبع باقي قسمة 17 على 5، ثم شرطا يستخدم && للتأكد أن العمر أكبر من 18 وأن hasId تساوي true.",
+                c: [
+                    ["استخدام %", /\d+\s*%\s*\d+/],
+                    ["استخدام &&", /&&/],
+                    ["استخدام if", /\bif\s*\(/],
+                    ["متغير hasId", /hasId/],
+                    ["console.log مرتين", /(console\.log[\s\S]*){2}/]
+                ]
+            },
+            {
+                t: "حلقة while",
+                x: `<p>while تكرر ما دام الشرط صحيحا. احذر: إن لم يتغير الشرط ستدور للأبد!</p><pre>let i = 1;\nwhile (i <= 3) {\n  console.log(i);\n  i++;\n}</pre>`,
+                q: [
+                    ["حلقة while تتوقف عندما:", ["يصبح الشرط خاطئا", "تنتهي 10 مرات", "دائما لا تتوقف"], 0],
+                    ["نسيان i++ داخل الحلقة يسبب:", ["حلقة لا نهائية", "توقفا فوريا", "لا شيء"], 0],
+                    ["أين يُكتب الشرط؟", ["بين الأقواس بعد while", "بعد الأقواس المعقوفة", "قبل while"], 0]
+                ],
+                p: "باستخدام while احسب مجموع الأرقام من 1 إلى 5 في متغير sum ثم اطبعه.",
+                c: [
+                    ["حلقة while", /while\s*\(/],
+                    ["متغير sum", /(?:let|var)\s+sum\b/],
+                    ["تجميع sum += أو sum = sum +", /sum\s*(\+=|=\s*sum\s*\+)/],
+                    ["زيادة العداد", /\+\+|\+=\s*1/],
+                    ["طباعة sum", /console\.log\(\s*sum/]
+                ]
+            },
+            {
+                t: "المشروع الختامي: حاسبة التقديرات",
+                x: `<p>سنجمع كل ما تعلمناه: دالة + مصفوفة + حلقة + شروط.</p><pre>function grade(score) {\n  if (score >= 90) return "A";\n  else if (score >= 75) return "B";\n  else return "C";\n}</pre>`,
+                q: [
+                    ["else if تُستخدم من أجل:", ["شرط إضافي", "تكرار", "تعريف متغير"], 0],
+                    ["دورنا في فحص كل عنصر بمصفوفة نستخدم:", ["for", "typeof", "return"], 0],
+                    ["الدالة التي ترجع قيمة تستخدم:", ["return", "push", "while"], 0]
+                ],
+                p: "اكتب دالة grade(score) ترجع A أو B أو C أو F باستخدام if وelse if، ثم أنشئ مصفوفة درجات (4 على الأقل) وطبع تقدير كل درجة بحلقة.",
+                c: [
+                    ["دالة grade", /function\s+grade\s*\(\s*\w+\s*\)/],
+                    ["استخدام else if مرة واحدة على الأقل", /else\s+if/],
+                    ["4 return أو أكثر", /(return[\s\S]*){4}/],
+                    ["مصفوفة درجات", /\[\s*\d+(\s*,\s*\d+){3,}\s*\]/],
+                    ["حلقة for أو forEach", /for\s*\(|forEach/],
+                    ["استدعاء grade داخل console.log", /console\.log\([^)]*grade\s*\(/]
+                ]
+            },
+            {
+                k: "html",
+                t: "HTML: هيكل الصفحة",
+                x: `<p>HTML لغة تصف محتوى صفحة الويب بواسطة <b>وسوم</b> (Tags). كل صفحة لها هيكل ثابت:</p><pre>&lt;!DOCTYPE html&gt;\n&lt;html&gt;\n&lt;head&gt;\n  &lt;title&gt;صفحتي&lt;/title&gt;\n&lt;/head&gt;\n&lt;body&gt;\n  &lt;h1&gt;مرحبا&lt;/h1&gt;\n&lt;/body&gt;\n&lt;/html&gt;</pre><p>head فيه معلومات الصفحة، وbody فيه ما يظهر للزائر.</p>`,
+                q: [
+                    ["أين يظهر محتوى الصفحة للزائر؟", ["body", "head", "title"], 0],
+                    ["الوسم الذي يضع عنوان التبويب:", ["title", "h1", "html"], 0],
+                    ["كل وسم يفتح يجب أن:", ["يُغلق", "يُحذف", "يُكرر"], 0]
+                ],
+                p: "اكتب صفحة HTML كاملة بعنوان (title) اسمه «صفحتي» ويظهر فيها عنوان h1 باسمك.",
+                c: [
+                    ["DOCTYPE", /<!doctype html>/i],
+                    ["وسما html وhead وbody", /<html[\s\S]*<head>[\s\S]*<\/head>[\s\S]*<body>[\s\S]*<\/body>[\s\S]*<\/html>/i],
+                    ["title بنص", /<title>[^<]+<\/title>/i],
+                    ["h1 بنص", /<h1>[^<]+<\/h1>/i]
+                ]
+            },
+            {
+                k: "html",
+                t: "HTML: العناوين والفقرات والتنسيق",
+                x: `<p>العناوين من h1 (الأكبر) إلى h6، والفقرة p، وللتنسيق: strong للعريض وem للمائل وbr لسطر جديد.</p><pre>&lt;h2&gt;عن الكورس&lt;/h2&gt;\n&lt;p&gt;هذا &lt;strong&gt;مهم&lt;/strong&gt; جدا&lt;/p&gt;</pre><p>ده شكل العناوين الستة فعليا من الأكبر للأصغر:</p><div class="hdemo"><h1>h1 عنوان</h1><h2>h2 عنوان</h2><h3>h3 عنوان</h3><h4>h4 عنوان</h4><h5>h5 عنوان</h5><h6>h6 عنوان</h6></div>`,
+                q: [
+                    ["أكبر عنوان هو:", ["h1", "h6", "head"], 0],
+                    ["الوسم الذي يجعل النص عريضا:", ["strong", "em", "br"], 0],
+                    ["الوسم الذي يُنشئ فقرة:", ["p", "pr", "para"], 0]
+                ],
+                p: "اكتب h1 وh2 وفقرتين p، واجعل كلمة واحدة على الأقل عريضة بـ strong وأخرى مائلة بـ em.",
+                c: [
+                    ["h1 وh2", /<h1>[\s\S]*<h2>/i],
+                    ["فقرتان p", /(<p>[\s\S]*<\/p>[\s\S]*){2}/i],
+                    ["strong", /<strong>[^<]+<\/strong>/i],
+                    ["em", /<em>[^<]+<\/em>/i]
+                ]
+            },
+            {
+                k: "html",
+                t: "HTML: الروابط والصور",
+                x: `<p>الرابط بالوسم a وخاصية href، والصورة img مع src وalt (نص بديل):</p><pre>&lt;a href="https://example.com"&gt;زر الموقع&lt;/a&gt;\n&lt;img src="logo.png" alt="شعار"&gt;</pre>`,
+                q: [
+                    ["الخاصية التي تحدد وجهة الرابط:", ["href", "src", "alt"], 0],
+                    ["فائدة alt في الصورة:", ["نص بديل عند تعذر التحميل", "تكبير الصورة", "تغيير اللون"], 0],
+                    ["الوسم img:", ["لا يحتاج وسم إغلاق", "يحتاج /img دائما", "لا يقبل src"], 0]
+                ],
+                p: "أنشئ رابطا لموقع https://www.google.com بنص واضح، وصورة لها src وalt.",
+                c: [
+                    ["رابط a مع href", /<a\s+[^>]*href=["'][^"']+["'][^>]*>[^<]+<\/a>/i],
+                    ["رابط يبدأ بـ https", /href=["']https?:\/\//i],
+                    ["صورة img مع src", /<img\s+[^>]*src=["'][^"']+["']/i],
+                    ["alt غير فارغة", /alt=["'][^"']+["']/i]
+                ]
+            },
+            {
+                k: "html",
+                t: "HTML: القوائم",
+                x: `<p>القائمة النقطية ul والمرقمة ol، وكل عنصر li:</p><pre>&lt;ul&gt;\n  &lt;li&gt;HTML&lt;/li&gt;\n  &lt;li&gt;CSS&lt;/li&gt;\n&lt;/ul&gt;</pre>`,
+                q: [
+                    ["القائمة المرقمة:", ["ol", "ul", "li"], 0],
+                    ["كل عنصر داخل القائمة يُكتب بوسم:", ["li", "p", "td"], 0],
+                    ["ul تعني:", ["قائمة غير مرتبة (نقاط)", "جدول", "رابط"], 0]
+                ],
+                p: "أنشئ قائمة نقطية ul بثلاثة عناصر، وقائمة مرقمة ol بثلاثة عناصر.",
+                c: [
+                    ["ul بثلاث li", /<ul>(\s*<li>[^<]+<\/li>){3}\s*<\/ul>/i],
+                    ["ol بثلاث li", /<ol>(\s*<li>[^<]+<\/li>){3}\s*<\/ol>/i]
+                ]
+            },
+            {
+                k: "html",
+                t: "HTML: الجداول",
+                x: `<p>الجدول table، صف tr، خلية عنوان th، خلية بيانات td:</p><pre>&lt;table&gt;\n  &lt;tr&gt;&lt;th&gt;الاسم&lt;/th&gt;&lt;th&gt;العمر&lt;/th&gt;&lt;/tr&gt;\n  &lt;tr&gt;&lt;td&gt;علي&lt;/td&gt;&lt;td&gt;20&lt;/td&gt;&lt;/tr&gt;\n&lt;/table&gt;</pre>`,
+                q: [
+                    ["الصف في الجدول:", ["tr", "td", "th"], 0],
+                    ["خلية عنوان العمود:", ["th", "td", "tr"], 0],
+                    ["الوسم الذي يحيط بالجدول كله:", ["table", "tab", "grid"], 0]
+                ],
+                p: "أنشئ جدولا بعمودين (الاسم، الدرجة) وصف عنوان وصفين بيانات على الأقل.",
+                c: [
+                    ["table", /<table[\s\S]*<\/table>/i],
+                    ["خليتا th", /(<th>[^<]+<\/th>[\s\S]*){2}/i],
+                    ["صفان بيانات (4 td)", /(<td>[^<]*<\/td>[\s\S]*){4}/i],
+                    ["3 tr على الأقل", /(<tr>[\s\S]*<\/tr>[\s\S]*){3}/i]
+                ]
+            },
+            {
+                k: "html",
+                t: "HTML: النماذج Forms",
+                x: `<p>النموذج form يجمع مدخلات المستخدم: input بأنواع (text, email, password) وlabel للتسمية وbutton للإرسال:</p><pre>&lt;form&gt;\n  &lt;label for="n"&gt;الاسم&lt;/label&gt;\n  &lt;input type="text" id="n"&gt;\n  &lt;button type="submit"&gt;إرسال&lt;/button&gt;\n&lt;/form&gt;</pre>`,
+                q: [
+                    ["نوع الإدخال لكلمة السر:", ["password", "hidden", "text2"], 0],
+                    ["الوسم الذي يربط نصا بحقل إدخال:", ["label", "name", "span"], 0],
+                    ["الزر الذي يرسل النموذج نوعه:", ["submit", "reset2", "link"], 0]
+                ],
+                p: "أنشئ نموذجا فيه حقل اسم (text) وحقل بريد (email) وقائمة select بخيارين وزر submit، وكل حقل له label.",
+                c: [
+                    ["form", /<form[\s\S]*<\/form>/i],
+                    ["حقل text", /type=["']text["']/i],
+                    ["حقل email", /type=["']email["']/i],
+                    ["select بخيارين", /<select>[\s\S]*(<option[^>]*>[^<]+<\/option>[\s\S]*){2}<\/select>/i],
+                    ["زر submit", /<button[^>]*type=["']submit["']/i],
+                    ["label مرتان", /(<label[^>]*>[^<]+<\/label>[\s\S]*){2}/i]
+                ]
+            },
+            {
+                k: "html",
+                t: "HTML: الوسوم الدلالية والمشروع الختامي",
+                x: `<p>الوسوم الدلالية تعطي معنى لأقسام الصفحة: header، nav، main، section، footer.</p><pre>&lt;header&gt;...&lt;/header&gt;\n&lt;nav&gt;...&lt;/nav&gt;\n&lt;main&gt;\n  &lt;section&gt;...&lt;/section&gt;\n&lt;/main&gt;\n&lt;footer&gt;...&lt;/footer&gt;</pre>`,
+                q: [
+                    ["الوسم الدلالي لتذييل الصفحة:", ["footer", "bottom", "end"], 0],
+                    ["الوسم الذي يحتوي روابط التنقل:", ["nav", "menu2", "header2"], 0],
+                    ["لماذا نستخدم الوسوم الدلالية؟", ["لوضوح المعنى وتحسين الوصول والبحث", "لتغيير الألوان فقط", "لتسريع الإنترنت"], 0]
+                ],
+                p: "ابن صفحة شخصية كاملة: DOCTYPE وhtml/head/title/body، وفي الجسم header وnav فيه رابطان وmain فيه section بقائمة ul وجدول، وfooter.",
+                c: [
+                    ["هيكل الصفحة كاملا", /<!doctype html>[\s\S]*<title>[^<]+<\/title>[\s\S]*<body>/i],
+                    ["header وnav وmain وfooter", /<header>[\s\S]*<nav>[\s\S]*<main>[\s\S]*<footer>/i],
+                    ["رابطان في nav", /<nav>[\s\S]*(<a\s[^>]*href=[^>]*>[\s\S]*){2}<\/nav>/i],
+                    ["section بها ul", /<section>[\s\S]*<ul>[\s\S]*<\/section>/i],
+                    ["جدول", /<table>[\s\S]*<\/table>/i]
+                ]
+            },
+            {
+                k: "css",
+                t: "CSS: المحددات والربط",
+                x: `<p>CSS لغة تنسيق شكل الصفحة. القاعدة = محدد + خصائص. أنواع المحددات: وسم <code>h1</code>، كلاس <code>.box</code>، معرّف <code>#main</code>.</p><pre>h1 { color: blue; }\n.box { background: #eee; }\n#main { padding: 10px; }</pre>`,
+                q: [
+                    ["المحدد الذي يبدأ بنقطة هو:", ["كلاس class", "معرّف id", "وسم"], 0],
+                    ["المحدد #main يستهدف:", ["العنصر الذي id=\"main\"", "كل الفقرات", "الكلاس main"], 0],
+                    ["كل خاصية تنتهي بـ:", ["فاصلة منقوطة ;", "نقطتين", "شرطة"], 0]
+                ],
+                p: "اكتب CSS: h1 لونه أحمر، وكلاس .box خلفيته رمادية فاتحة، ومعرّف #main له padding.",
+                c: [
+                    ["قاعدة h1 بخاصية color", /h1\s*\{[^}]*color\s*:[^}]+\}/i],
+                    ["قاعدة كلاس .box بخلفية", /\.box\s*\{[^}]*background(-color)?\s*:[^}]+\}/i],
+                    ["قاعدة #main بـ padding", /#main\s*\{[^}]*padding\s*:[^}]+\}/i]
+                ]
+            },
+            {
+                k: "css",
+                t: "CSS: الألوان والخطوط",
+                x: `<p>أهم الخصائص: <code>color</code> لون النص، <code>background-color</code> الخلفية، <code>font-size</code> الحجم، <code>font-family</code> نوع الخط، <code>text-align</code> المحاذاة.</p><pre>p {\n  color: #333;\n  font-size: 18px;\n  font-family: Arial, sans-serif;\n}</pre>`,
+                q: [
+                    ["الخاصية التي تغيّر حجم الخط:", ["font-size", "text-size", "font-style2"], 0],
+                    ["اللون #ff0000 هو:", ["أحمر", "أزرق", "أخضر"], 0],
+                    ["الخاصية التي تحاذي النص للوسط: text-align مع القيمة:", ["center", "middle", "align"], 0]
+                ],
+                p: "نسّق body بحيث يكون لها font-family وbackground-color، ونسّق h1 بـ color وfont-size وtext-align: center.",
+                c: [
+                    ["body مع font-family", /body\s*\{[^}]*font-family\s*:[^}]+\}/i],
+                    ["body مع background-color", /body\s*\{[^}]*background-color\s*:[^}]+\}/i],
+                    ["h1 مع color وfont-size", /h1\s*\{(?=[^}]*color\s*:)(?=[^}]*font-size\s*:)[^}]*\}/i],
+                    ["text-align: center", /text-align\s*:\s*center/i]
+                ]
+            },
+            {
+                k: "css",
+                t: "CSS: الـ Box Model",
+                x: `<p>كل عنصر صندوق: المحتوى ثم <b>padding</b> (داخلي) ثم <b>border</b> (الحد) ثم <b>margin</b> (الخارجي).</p><pre>.card {\n  width: 300px;\n  padding: 16px;\n  border: 2px solid black;\n  margin: 20px;\n  border-radius: 12px;\n}</pre>`,
+                q: [
+                    ["المسافة داخل العنصر تسمى:", ["padding", "margin", "border"], 0],
+                    ["المسافة خارج العنصر تسمى:", ["margin", "padding", "width"], 0],
+                    ["الخاصية التي تدوّر الزوايا:", ["border-radius", "corner", "round"], 0]
+                ],
+                p: "نسّق كلاس .card بـ width وpadding وborder وmargin وborder-radius.",
+                c: [
+                    ["كلاس .card", /\.card\s*\{[^}]+\}/i],
+                    ["width وpadding", /\.card\s*\{(?=[^}]*width\s*:)(?=[^}]*padding\s*:)[^}]*\}/i],
+                    ["border وmargin", /\.card\s*\{(?=[^}]*border\s*:)(?=[^}]*margin\s*:)[^}]*\}/i],
+                    ["border-radius", /border-radius\s*:/i]
+                ]
+            },
+            {
+                k: "css",
+                t: "CSS: Flexbox",
+                x: `<p>Flexbox يرتّب العناصر في صف أو عمود بسهولة:</p><pre>.row {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 12px;\n}</pre>`,
+                q: [
+                    ["لتفعيل flexbox نكتب:", ["display: flex", "flex: on", "position: flex"], 0],
+                    ["الخاصية التي توزّع العناصر أفقيا:", ["justify-content", "align-text", "flex-text"], 0],
+                    ["الخاصية التي تضع مسافة بين العناصر:", ["gap", "space2", "hole"], 0]
+                ],
+                p: "اكتب كلاس .row يستخدم display: flex مع justify-content وalign-items وgap، وكلاس .col يستخدم flex-direction: column.",
+                c: [
+                    ["display: flex", /display\s*:\s*flex/i],
+                    ["justify-content", /justify-content\s*:/i],
+                    ["align-items", /align-items\s*:/i],
+                    ["gap", /gap\s*:/i],
+                    ["flex-direction: column", /flex-direction\s*:\s*column/i]
+                ]
+            },
+            {
+                k: "css",
+                t: "CSS: التجاوب والوحدات",
+                x: `<p>وحدات مرنة: <code>%</code> و<code>rem</code> و<code>vw</code>. وللتجاوب مع الشاشات الصغيرة نستخدم media query:</p><pre>.box { width: 50%; }\n@media (max-width: 600px) {\n  .box { width: 100%; }\n}</pre>`,
+                q: [
+                    ["media query تُستخدم من أجل:", ["تغيير التنسيق حسب حجم الشاشة", "تشغيل الصوت", "إضافة صور"], 0],
+                    ["أي وحدة نسبية لحجم الخط الأساسي؟", ["rem", "px", "cm"], 0],
+                    ["max-width: 600px تعني:", ["الشاشات حتى 600 بكسل", "الشاشات أكبر من 600", "شاشة واحدة فقط"], 0]
+                ],
+                p: "اكتب .box بعرض 50% ثم media query عند max-width: 600px يجعل عرضه 100%، واستخدم rem في font-size لعنصر ما.",
+                c: [
+                    ["عرض بنسبة مئوية", /width\s*:\s*\d+%/i],
+                    ["@media مع max-width", /@media[^{]*max-width\s*:\s*\d+px[^{]*\{/i],
+                    ["عرض 100% داخل media", /@media[\s\S]*width\s*:\s*100%/i],
+                    ["استخدام rem", /\d+(\.\d+)?rem/i]
+                ]
+            },
+            {
+                k: "css",
+                t: "CSS: المشروع الختامي (متغيرات + دارك مود)",
+                x: `<p>متغيرات CSS تسهّل تغيير الألوان كلها من مكان واحد، ويمكن تغييرها تلقائيا حسب نظام المستخدم:</p><pre>:root { --bg: #fff; --tx: #111; }\n@media (prefers-color-scheme: dark) {\n  :root { --bg: #111; --tx: #eee; }\n}\nbody { background: var(--bg); color: var(--tx); }</pre>`,
+                q: [
+                    ["كيف نقرأ متغير CSS؟", ["var(--bg)", "get(--bg)", "$bg"], 0],
+                    ["المتغيرات العامة تُعرّف داخل:", [":root", "body2", "html2"], 0],
+                    ["الوضع الداكن التلقائي يعتمد على:", ["prefers-color-scheme: dark", "dark-mode: on", "theme: night"], 0]
+                ],
+                p: "عرّف متغيرين --bg و--tx في :root، وأعد تعريفهما داخل @media (prefers-color-scheme: dark)، واستخدمهما في body عبر var()، وأضف transition وتأثير :hover لزر .btn.",
+                c: [
+                    ["متغيرات في :root", /:root\s*\{[^}]*--bg\s*:[^}]*--tx\s*:|:root\s*\{[^}]*--tx\s*:[^}]*--bg\s*:/i],
+                    ["media للدارك مود", /@media\s*\(\s*prefers-color-scheme\s*:\s*dark\s*\)/i],
+                    ["استخدام var(--bg) وvar(--tx)", /var\(\s*--bg\s*\)[\s\S]*var\(\s*--tx\s*\)|var\(\s*--tx\s*\)[\s\S]*var\(\s*--bg\s*\)/i],
+                    ["transition", /transition\s*:/i],
+                    ["تأثير .btn:hover", /\.btn\s*:hover\s*\{[^}]+\}/i]
+                ]
+            }
+        ];
+        const E = {
+            "ما هي البرمجة؟": "console¦ده الكائن اللي بيتحكم في «الكونسول» يعني شاشة الطباعة بتاعة المتصفح؛؛ .¦النقطة معناها «هات اللي جوه»: console.log يعني هات أمر log من جوه console؛؛ log¦اسم الأمر، ومعناه «اطبع» اللي في القوسين؛؛ ( )¦القوسين بيشيلوا الحاجة اللي عايزين نطبعها؛؛ \" \"¦علامتين التنصيص بيقولوا للكمبيوتر «ده كلام عادي مش أمر»؛؛ ;¦الفاصلة المنقوطة زي النقطة في آخر الجملة: خلصنا الأمر؛؛مرحبا¦الكلام اللي بين التنصيص بيتطبع زي ما هو بالظبط، حتى العربي؛؛ حروف كبيرة وصغيرة¦Console مش زي console: أي حرف كبير غلط والأمر مش هيشتغل؛؛ ' '¦التنصيص المفرد شغال زي المزدوج، المهم تقفل بنفس النوع اللي فتحت بيه؛؛ ` `¦علامة الباك تيك بتسمح تحط متغير جوه النص بالشكل ${اسم}؛؛ ${ }¦بتدخل قيمة متغير وسط نص مكتوب بباك تيك؛؛ =¦واحدة معناها «ضع القيمة»؛؛ == و ===¦اتنين أو تلاتة معناها «هل يساوي؟» والتلاتة أدق لأنها بتقارن النوع كمان؛؛ !=¦معناها «مش يساوي»؛؛ < و >¦أصغر من وأكبر من؛؛ <= و >=¦أصغر من أو يساوي، وأكبر من أو يساوي؛؛ +=¦زوّد على القيمة الحالية: x += 2 يعني x = x + 2؛؛ ++ و --¦زوّد واحد أو نقّص واحد؛؛ -¦طرح؛؛ *¦ضرب؛؛ /¦قسمة؛؛ %¦باقي القسمة؛؛ &&  ||  !¦و، أو، مش؛؛ :¦نقطتين، بتفصل المفتاح عن قيمته جوه الكائن؛؛ ,¦فاصلة بتفصل بين العناصر؛؛ /* */¦تعليق طويل بيتكتب على كذا سطر والكمبيوتر بيتجاهله",
+            "المتغيرات": "let¦كلمة بتعمل متغير جديد ممكن قيمته تتغير بعدين؛؛ const¦بتعمل متغير ثابت، أول ما تحط فيه قيمة مش هتقدر تغيرها؛؛ age / name¦اسم المتغير، إنت اللي بتختاره بس من غير مسافات؛؛ =¦علامة الوضع: بتحط القيمة اللي على اليمين جوه المتغير (مش معناها «يساوي»)؛؛ 20¦رقم بنكتبه من غير تنصيص؛؛ +¦بتجمع الأرقام، وبتلزّق النصوص ببعض؛؛ \" \"¦تنصيص فيه مسافة عشان الاسم والسن ما يلزقوش في بعض؛؛Ali¦نص بيتحط بين تنصيص، وأول حرف كبير مجرد عادة مش قاعدة؛؛ ;¦في آخر كل سطر تعريف؛؛ المسافات حوالين =¦للراحة بس، لكن مسافة بعد let ضرورية؛؛ حروف الاسم¦الاسم لازم يبدأ بحرف مش برقم، وما يكونش فيه مسافة",
+            "أنواع البيانات": "typeof¦كلمة بتقولك نوع القيمة اللي بعدها؛؛ \"hi\"¦نص (string) لأنه بين تنصيص؛؛ 25¦رقم (number) لأنه من غير تنصيص؛؛ true / false¦قيمة منطقية (boolean) يا صح يا غلط، مفيش تالت؛؛ //¦بداية تعليق: الكمبيوتر بيتجاهله وده كلام لينا إحنا؛؛ string¦ده اللي هيظهر: نوع النص؛؛console.log( )¦بيطبع النتيجة اللي بيرجعها typeof؛؛ ;¦نهاية الأمر؛؛ string¦هو الناتج اللي هيتطبع، معناه نص",
+            "الشروط if / else": "if¦معناها «لو»، بتبدأ بيها القرار؛؛ ( )¦جواهم الشرط اللي هنفحصه؛؛ age >= 18¦الشرط: هل السن أكبر من أو يساوي 18؟؛؛ { }¦بيلموا الأوامر اللي هتتنفذ لما الشرط يتحقق؛؛ else¦معناها «وإلا»: بتتنفذ لما الشرط ما يتحققش؛؛ console.log¦الأمر اللي بيطبع النتيجة في كل حالة؛؛age¦اسم متغير فيه السن؛؛ 18¦الرقم اللي بنقارن بيه؛؛ \"adult\" / \"minor\"¦النصوص اللي هتتطبع في كل حالة؛؛ } else {¦القوس اللي بيقفل if وبعده else وبيفتح جسم else في نفس السطر؛؛ الإزاحة¦المسافات في أول السطر بتوضح إن الأوامر جوه القوس",
+            "الحلقات": "for¦كلمة بتبدأ بيها الحلقة (التكرار)؛؛ let i = 1¦أول جزء: عداد اسمه i بيبدأ من 1؛؛ i <= 5¦تاني جزء: كمّل لحد ما i تبقى أكبر من 5؛؛ i++¦تالت جزء: زوّد i بواحد بعد كل لفة؛؛ ;¦بتفصل بين الأجزاء التلاتة؛؛ { }¦الأوامر اللي هتتكرر كل لفة؛؛ console.log(i)¦بيطبع قيمة العداد في كل لفة؛؛let¦عشان نعمل العداد i؛؛ 1 و 5¦بداية ونهاية العد؛؛ i¦اسم العداد، الحرف i من كلمة index وهو متعارف عليه",
+            "الدوال": "function¦كلمة بتعمل دالة يعني مجموعة أوامر ليها اسم؛؛ add¦اسم الدالة وإنت اللي بتختاره؛؛ (a, b)¦المدخلات اللي الدالة بتستناها، والفاصلة بتفصل بينهم؛؛ { }¦جسم الدالة: الأوامر اللي جواها؛؛ return¦بترجّع النتيجة لمكان النداء وبتنهي الدالة؛؛ a + b¦العملية اللي هتترجع؛؛ add(2, 3)¦النداء: نشغل الدالة ونديها 2 و3، والناتج 5؛؛a + b¦جمع القيمتين؛؛ console.log(add(2, 3))¦نداء الدالة جوه القوسين وبعدين طباعة الناتج؛؛ 2 و 3¦القيم اللي هتدخل مكان a و b",
+            "المصفوفات": "[ ]¦القوسين المربعين هما اللي بيعملوا المصفوفة (قايمة)؛؛ \"apple\", \"banana\"¦العناصر، والفاصلة بتفصل بينهم؛؛ fruits[0]¦الرقم بين [ ] هو ترتيب العنصر وبيبدأ من صفر مش من واحد؛؛ .length¦بتقولك عدد العناصر اللي في المصفوفة؛؛ .push(\"mango\")¦بتضيف عنصر جديد في آخر المصفوفة؛؛ //¦تعليق بيشرح الناتج؛؛const fruits =¦بنحط المصفوفة في متغير ثابت؛؛ ;¦نهاية كل أمر؛؛ // apple¦تعليق بيقولك الناتج المتوقع؛؛ // 2¦تعليق بيقولك عدد العناصر",
+            "الكائنات Objects": "{ }¦القوسين المعقوفين بيلموا بيانات الكائن؛؛ name: \"Ali\"¦اسم الخاصية ونقطتين وبعدين القيمة؛؛ ,¦بتفصل بين خاصية والتانية؛؛ student.name¦النقطة بتجيب خاصية من الكائن؛؛ student.city = \"Cairo\"¦بتضيف خاصية جديدة اسمها city، ولو موجودة بتغير قيمتها؛؛ const student¦الكائن اتحط في متغير اسمه student؛؛const student =¦بنحط الكائن في متغير ثابت؛؛ age: 20¦خاصية تانية: السن؛؛ ;¦نهاية الأمر",
+            "العوامل الحسابية والمنطقية": "+ - * /¦جمع وطرح وضرب وقسمة؛؛ %¦باقي القسمة: 10 % 3 الناتج 1؛؛ &&¦معناها «و»: الشرطين لازم يتحققوا سوا؛؛ ||¦معناها «أو»: يكفي شرط واحد منهم؛؛ !¦معناها «مش»: بتعكس صح لغلط؛؛ >¦أكبر من؛؛ hasId¦متغير منطقي بيقول هل معاه هوية ولا لأ؛؛if ( )¦الشرط بيتحط بين القوسين؛؛ { }¦قوسين فاضيين، ممكن تكتب جواهم أوامر؛؛ 10 و 3¦الرقمين في عملية الباقي؛؛ 18¦الرقم اللي بنقارن بيه",
+            "حلقة while": "while¦معناها «طالما»: كرر طالما الشرط صح؛؛ let i = 1¦بنجهز العداد قبل الحلقة؛؛ i <= 3¦الشرط، بيتفحص قبل كل لفة؛؛ { }¦الأوامر اللي بتتكرر؛؛ console.log(i)¦بيطبع العداد؛؛ i++¦بيزود العداد؛ من غيره الشرط يفضل صح والحلقة ما تخلصش أبدا",
+            "المشروع الختامي: حاسبة التقديرات": "function grade(score)¦دالة اسمها grade بتاخد الدرجة وتقولك التقدير؛؛ if (score >= 90)¦أول شرط: لو الدرجة 90 أو أكتر؛؛ return \"A\"¦بترجع الحرف A وتخرج من الدالة على طول؛؛ else if¦شرط تاني بيتفحص لو اللي قبله ما اتحققش؛؛ else¦آخر حالة: أي حاجة ما طابقتش اللي فات؛؛ { }¦بيلموا كل حالة؛؛75¦حد الدرجة لتقدير B؛؛ \"B\" و \"C\"¦الحروف اللي هترجع؛؛ ;¦نهاية كل return؛؛ score¦اسم المدخل جوه الدالة",
+            "HTML: هيكل الصفحة": "<!DOCTYPE html>¦دي بتقول للمتصفح «خلي بالك إحنا هنكتب بلغة HTML5 الحديثة»؛؛ <html> … </html>¦ده البيت الكبير اللي شايل الموقع كله، أي حاجة هتكتبها لازم تكون جواه؛؛ <head> … </head>¦دي دماغ الموقع، فيها معلومات ما حدش بيشوفها غير المتصفح؛؛ <title>صفحتي</title>¦اسم الصفحة اللي بيظهر فوق في تاب المتصفح؛؛ <body> … </body>¦جسم الموقع، أي حاجة عايزها تظهر للناس تكتبها جواه؛؛ <h1>مرحبا</h1>¦أكبر عنوان، و h1 معناها Heading 1؛؛<¦علامة أصغر من، في HTML معناها «هنا بيبدأ وسم»؛؛ >¦علامة أكبر من، معناها «هنا الوسم خلص»؛؛ /¦السلاش قبل اسم الوسم معناها «ده وسم القفل»؛؛ !¦علامة التعجب في أول DOCTYPE معناها «ده مش وسم عادي، ده إعلان للمتصفح»؛؛ DOCTYPE¦كلمة معناها «نوع المستند»؛؛ html (اللي بعد DOCTYPE)¦بتحدد إن نوع المستند صفحة HTML؛؛ المسافة بين DOCTYPE و html¦لازم تفصل بين الكلمتين؛؛ الكلام العربي بين الوسمين¦نص عادي بيظهر في الصفحة زي ما هو؛؛ النزول لسطر جديد والإزاحة¦للترتيب بس والمتصفح بيتجاهلها؛؛ حروف كبيرة وصغيرة¦مالهاش فرق في HTML لكن الأفضل تكتب الوسوم بحروف صغيرة",
+            "HTML: العناوين والفقرات والتنسيق": "<h1>¦أكبر عنوان وأهمه، بنستخدمه مرة واحدة بس في الصفحة للعنوان الرئيسي؛؛ <h2>¦عنوان فرعي تحت h1 وأصغر منه شوية، بنستخدمه لأقسام الصفحة زي «عن الكورس»؛؛ <h3>¦عنوان تحت h2، بيقسّم القسم لأجزاء أصغر؛؛ <h4>¦عنوان تحت h3، بيتستخدم لتفاصيل دقيقة وقليل ما بتحتاجه؛؛ <h5>¦عنوان صغير جدا تحت h4؛؛ <h6>¦أصغر عنوان وأقلهم أهمية، حجمه قريب من الكلام العادي؛؛ h1 ← h6¦الرقم بيصغّر العنوان: 1 الأكبر و6 الأصغر، والأفضل تمشي بالترتيب ومتقفزش من h2 لـ h5؛؛ </h2> </h3> </h4> </h5> </h6>¦كل عنوان بيتقفل بنفس رقمه، فتحت h3 يبقى تقفله </h3> مش </h2>؛؛ <h7>¦مفيش h7! لو كتبته المتصفح مش هيعتبره عنوان وهيطلع كلام عادي؛؛ <p>¦الـ p اختصار Paragraph يعني فقرة؛؛ <strong>¦بيخلي الكلمة عريضة (Bold) ومهمة؛؛ <em>¦بيخلي الكلمة مايلة عشان نأكد عليها؛؛ <br>¦بينزّل سطر جديد، وده مش بيتقفل؛؛ </p>¦السلاش / معناها «قفلنا»؛ نفس اسم الوسم بس بسلاش؛؛<strong> جوه <p>¦وسم جوه وسم: لازم تقفل الداخلي الأول وبعدين الخارجي؛؛ عن الكورس¦نص العنوان اللي هيظهر للناس؛؛ جدا¦كلام عادي بعد الوسم بيكمل الجملة",
+            "HTML: الروابط والصور": "<a>¦الـ a اختصار Anchor يعني رابط الواحد بيدوس عليه؛؛ href¦عنوان المكان اللي الرابط هيودّيك له؛؛ =¦بتربط اسم الخاصية بقيمتها؛؛ \"https://…\"¦علامتين التنصيص بيلفوا قيمة الخاصية؛؛ زر الموقع¦الكلام اللي بين الوسمين هو اللي بيظهر للناس؛؛ <img>¦صورة (Image)، وملهاش وسم قفل؛؛ src¦مكان ملف الصورة (Source)؛؛ alt¦وصف للصورة بالكلام لو ما فتحتش أو للمكفوفين؛؛المسافة بين a و href¦لازم تفصل اسم الوسم عن الخاصية؛؛ example.com¦عنوان الموقع اللي هيروحله الرابط؛؛ logo.png¦اسم ملف الصورة وامتداده png؛؛ \"شعار\"¦الوصف اللي هيتقري لو الصورة ما ظهرتش",
+            "HTML: القوائم": "<ul>¦قايمة بنقط (Unordered List)؛؛ <ol>¦قايمة مرقمة 1 2 3 (Ordered List)؛؛ <li>¦كل عنصر جوه القايمة (List Item)؛؛ المسافات قبل li¦ترتيب بس عشان الكود يتقري، المتصفح مش بيهتم بيها؛؛ </ul>¦لازم تقفل القايمة بعد آخر li",
+            "HTML: الجداول": "<table>¦الجدول كله؛؛ <tr>¦صف أفقي (Table Row)؛؛ <th>¦خلية العنوان وبتظهر عريضة (Table Header)؛؛ <td>¦خلية بيانات عادية (Table Data)؛؛ الترتيب¦table فيها tr، وكل tr فيها خلايا th أو td؛؛الاسم / العمر / علي / 20¦كلام عادي جوه الخلايا؛؛ </tr>¦قفل الصف قبل ما تبدأ صف جديد",
+            "HTML: النماذج Forms": "<form>¦الاستمارة اللي بتلم كل الحقول؛؛ <label>¦الكلمة اللي بتشرح الحقل زي «الاسم»؛؛ for¦بتربط الـ label بالحقل اللي الـ id بتاعه نفس القيمة؛؛ <input>¦الحقل اللي الواحد بيكتب فيه، وملوش وسم قفل؛؛ type=\"text\"¦نوع الحقل: نص عادي (email بريد، password سر)؛؛ id=\"n\"¦اسم مميز للحقل ماينفعش يتكرر؛؛ <button type=\"submit\">¦زرار بيبعت الاستمارة؛؛المسافة بين type و id¦كل خاصية بتتفصل عن اللي بعدها بمسافة؛؛ الاسم¦نص الـ label اللي بيظهر جنب الحقل؛؛ إرسال¦الكلمة اللي بتظهر على الزرار",
+            "HTML: الوسوم الدلالية والمشروع الختامي": "<header>¦راس الصفحة (اللوجو والعنوان)؛؛ <nav>¦قايمة الروابط اللي بتنقلك بين الصفحات؛؛ <main>¦المحتوى الأساسي، مرة واحدة بس في الصفحة؛؛ <section>¦قسم جوه المحتوى ليه موضوع؛؛ <footer>¦آخر الصفحة (حقوق وتواصل)؛؛ ...¦النقط في المثال معناها «هنا تحط المحتوى»",
+            "CSS: المحددات والربط": "h1¦اسم الوسم اللي عايز أنسقه، وكده هنسق كل h1؛؛ .box¦النقطة معناها كلاس (class) يعني مجموعة عناصر ليها نفس الاسم؛؛ #main¦علامة # معناها id يعني عنصر واحد بس؛؛ { }¦القوسين بيلموا كل التنسيقات؛؛ color¦اسم الخاصية اللي هغيرها؛؛ :¦النقطتين بتفصل اسم الخاصية عن قيمتها؛؛ blue¦القيمة اللي هحطها؛؛ ;¦آخر كل خاصية زي النقطة؛؛حروف كبيرة وصغيرة¦اكتب الخصائص بحروف صغيرة زي color؛؛ المسافات حوالين { }¦للراحة بس؛؛ #eee¦لون رمادي فاتح، بيتكتب بـ 3 خانات؛؛ 10px¦عشرة بكسل؛؛ background¦خاصية خلفية العنصر؛؛ padding¦مسافة جوه العنصر؛؛ /* */¦تعليق في CSS، المتصفح بيتجاهله؛؛ h1, h2¦الفاصلة بتخليك تنسق أكتر من وسم بنفس القاعدة",
+            "CSS: الألوان والخطوط": "color¦لون الكلام؛؛ background-color¦لون خلفية العنصر؛؛ font-size¦حجم الكلام؛؛ 18px¦الرقم 18 ووحدة px يعني بكسل؛؛ #333¦لون بكود: # وبعدها 3 أو 6 خانات للأحمر والأخضر والأزرق؛؛ font-family¦نوع الخط؛؛ Arial, sans-serif¦الفاصلة بتحط خط بديل لو الأول مش موجود؛؛p¦اسم الوسم اللي بننسقه (الفقرات)؛؛ Arial¦اسم خط معروف؛؛ sans-serif¦نوع خط عام بدون زوائد، بيتحط كبديل أخير؛؛ 333¦الرقم اللي بعد # بيدرّج من الأسود للأبيض",
+            "CSS: الـ Box Model": "width¦عرض الصندوق؛؛ padding¦مسافة جوه الصندوق بين الكلام والحد؛؛ border: 2px solid black¦3 حاجات: سُمك الحد 2px، وشكله solid خط مصمت، ولونه أسود؛؛ margin¦مسافة برا الصندوق بتبعده عن اللي جنبه؛؛ border-radius¦بيدوّر الزوايا؛؛.card¦كلاس بنستهدفه بالنقطة؛؛ 300px و 16px و 20px و 12px¦أرقام بوحدة بكسل، كل واحد لخاصية بتاعته؛؛ solid¦شكل الخط: متصل؛؛ black¦اسم لون جاهز",
+            "CSS: Flexbox": "display: flex¦بيحوّل الصندوق لـ Flexbox يعني عناصره تترتب جنب بعض؛؛ justify-content¦بيوزع العناصر بالعرض؛؛ space-between¦مسافة متساوية بين العناصر؛؛ align-items¦بيظبط العناصر بالطول؛؛ center¦في النص؛؛ gap¦مسافة ثابتة بين كل عنصرين؛؛.row¦كلاس بنستهدفه بالنقطة؛؛ 12px¦مسافة اثنا عشر بكسل بين العناصر؛؛ column¦قيمة flex-direction معناها ترتيب العناصر فوق بعض",
+            "CSS: التجاوب والوحدات": "%¦نسبة من الصندوق الحاوي، 50% يعني نصه؛؛ @media¦تنسيق بيشتغل بس لو الشرط اتحقق؛؛ (max-width: 600px)¦الشرط: لو عرض الشاشة 600 بكسل أو أقل يعني موبايل؛؛ { { } }¦القوس الأول بتاع media واللي جواه بتاع القاعدة؛؛ rem¦وحدة نسبية لحجم الخط الأساسي، 2rem يعني ضعفه؛؛.box¦كلاس بنستهدفه بالنقطة؛؛ width¦عرض العنصر؛؛ 100%¦كامل عرض الصندوق الحاوي؛؛ @¦علامة @ في أول كلمة media بتدل إنها تعليمة خاصة مش خاصية",
+            "CSS: المشروع الختامي (متغيرات + دارك مود)": ":root¦أعلى عنصر في الصفحة، فالمتغير بيشتغل في كل مكان؛؛ --bg¦اسم متغير من عندك لازم يبدأ بشرطتين؛؛ var(--bg)¦بيقرا قيمة المتغير؛؛ prefers-color-scheme: dark¦بيسأل: هل الجهاز على الوضع الليلي؟؛؛ @media¦تنسيق بشرط؛؛ transition¦بيخلي التغيير يحصل بنعومة مش فجأة؛؛ :hover¦لما الماوس أو الصباع يقف على الزرار؛؛#fff و #111 و #eee¦ألوان بكود: أبيض وأسود تقريبا ورمادي فاتح؛؛ body¦وسم الجسم اللي بنطبق عليه المتغيرات؛؛ background¦خاصية الخلفية؛؛ color¦لون الكلام؛؛ ( )¦قوسين بيشيلوا القيمة اللي بتسأل عنها؛؛ --tx¦متغير تاني للون النص"
+        };
+        const T = {
+            "ما هي البرمجة؟": "الكمبيوتر بينفذ سطر سطر من فوق لتحت زي وصفة الأكل، ولو غلطت في حرف واحد مش هيفهمك.",
+            "المتغيرات": "المتغير زي علبة عليها اسم: بتحط فيها حاجة وبعدين تنده عليها بالاسم.",
+            "أنواع البيانات": "النص بين تنصيص، الرقم من غير تنصيص، وصح/غلط من غير تنصيص برضه. \"10\" نص لكن 10 رقم!",
+            "الشروط if / else": "زي ما بتقول: لو الجو بارد البس جاكت، وإلا ما تلبسوش. الكمبيوتر بيختار طريق واحد بس.",
+            "الحلقات": "بدل ما تكتب console.log خمس مرات، بتكتبه مرة واحدة والحلقة تكرره. أجزاء for التلاتة: بداية ; شرط ; زيادة.",
+            "الدوال": "الدالة زي ماكينة العصير: تعملها مرة، وكل مرة تديها فاكهة تطلعلك عصير (return).",
+            "المصفوفات": "الترتيب في البرمجة بيبدأ من 0: أول عنصر رقمه 0، تاني عنصر رقمه 1 وهكذا.",
+            "الكائنات Objects": "الكائن زي بطاقة الهوية: اسم وسن ومدينة، كل معلومة ليها عنوان.",
+            "العوامل الحسابية والمنطقية": "&& لازم الاتنين صح، || يكفي واحد صح. زي: تدخل النادي لو معاك كارنيه && دفعت.",
+            "حلقة while": "احذر من الحلقة اللانهائية: لو نسيت تغيّر العداد الشرط هيفضل صح للأبد والصفحة هتهنّج.",
+            "المشروع الختامي: حاسبة التقديرات": "ده تجميع كل اللي اتعلمناه: دالة + شروط + مصفوفة + حلقة.",
+            "HTML: هيكل الصفحة": "الترتيب عامل زي كده:\nالبيت الكبير html\n   ├── الدماغ head ← جواه العنوان title\n   └── الجسم body ← جواه الكلام اللي الناس بتشوفه h1\nكل حاجة بتفتحها لازم تقفلها: فتحت <h1> يبقى لازم تقفلها </h1>",
+            "HTML: العناوين والفقرات والتنسيق": "العنوان h1 مرة واحدة بس في الصفحة، وبعدها h2 و h3 بالترتيب. كل وسم بتفتحه لازم تقفله.",
+            "HTML: الروابط والصور": "الرابط والصورة الاتنين بيحتاجوا خاصية: الرابط href، والصورة src و alt.",
+            "HTML: القوائم": "القايمة دايما فيها وسمين: الحاوية (ul أو ol) والعناصر (li).",
+            "HTML: الجداول": "فكّر في الجدول زي إكسل: صفوف (tr) وجواها خلايا (td).",
+            "HTML: النماذج Forms": "كل حقل ليه label، وكل label بيتربط بالحقل عن طريق نفس القيمة في for و id.",
+            "HTML: الوسوم الدلالية والمشروع الختامي": "الوسوم دي ما بتغيّرش الشكل، بس بتقول للمتصفح ولمحركات البحث المعنى: ده راس وده تذييل.",
+            "CSS: المحددات والربط": "القاعدة: محدد { خاصية: قيمة; }. اللي قبل القوس بتختار بيه العنصر، واللي جواه بتقول تعمل فيه إيه.",
+            "CSS: الألوان والخطوط": "الخاصية دايما ليها قيمة، وبينهم نقطتين، وفي الآخر فاصلة منقوطة.",
+            "CSS: الـ Box Model": "كل عنصر صندوق: الكلام في النص، وبعده padding، وبعده border، وبعده margin.",
+            "CSS: Flexbox": "justify-content للعرض (أفقي)، و align-items للطول (رأسي).",
+            "CSS: التجاوب والوحدات": "التجاوب معناه إن الصفحة تتظبط لوحدها على الموبايل والكمبيوتر.",
+            "CSS: المشروع الختامي (متغيرات + دارك مود)": "غيّر لون واحد في المتغير والصفحة كلها تتغير. وده أساس الوضع الليلي."
+        };
+        const esc = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        const tbl = (e, t) => e ? '<h4>🎨 الشرح خطوة بخطوة</h4>' + e.split("؛؛").map((p, i) => {
+            const [a, ...b] = p.split("¦");
+            return '<div class="ex c' + (i % 6) + '"><code dir="ltr">' + esc(a.trim()) + '</code><span>' + esc(b.join("¦")) + '</span></div>'
+        }).join("") + (t ? '<div class="tip">💡 ' + esc(t) + "</div>" : "") : "";
+        const GN = {
+                html: "🌐 الجزء الأول: HTML",
+                css: "🎨 الجزء الثاني: CSS",
+                js: "⚡ الجزء الثالث: JavaScript"
+            },
+            ORD = ["html", "css", "js"];
+        const Q = {
+            "ما هي البرمجة؟": "ماذا يحدث لو كتبت Console.log بحرف C كبير؟¦يحدث خطأ لأن الحروف حساسة للحالة¦يعمل بشكل طبيعي¦يطبع كلمة Console؛؛ ماذا تعني ; في آخر السطر؟¦انتهاء الأمر¦بداية تعليق¦تكرار الأمر؛؛ ما ناتج console.log(\"5\" + \"5\")؟¦55¦10¦خطأ؛؛ لغة JavaScript تعمل في:¦المتصفح ومواقع الويب¦الطابعة فقط¦الكاميرا فقط؛؛ التنصيص المفرد ' ' يُستخدم لكتابة:¦نص¦أمر¦رقم فقط",
+            "المتغيرات": "أي اسم متغير صحيح؟¦userName¦2name¦my name؛؛ ماذا يحدث لو غيّرت قيمة const؟¦يحدث خطأ¦تتغير القيمة¦يتجاهل الكمبيوتر السطر؛؛ ناتج: let x = 2; x = x + 3; console.log(x)¦5¦2¦3؛؛ ماذا تعني = في let a = 5؟¦ضع القيمة 5 في a¦a تساوي 5 للمقارنة¦اطبع 5؛؛ ناتج console.log(\"a\" + 1)¦a1¦1a¦خطأ",
+            "أنواع البيانات": "ما ناتج typeof 42؟¦number¦string¦boolean؛؛ أي قيمة نصية؟¦\"true\"¦true¦25؛؛ ما ناتج typeof false؟¦boolean¦string¦number؛؛ ماذا تفعل // في الكود؟¦تبدأ تعليقا¦تقسم رقمين¦تطبع نصا؛؛ ما ناتج typeof \"25\"؟¦string¦number¦boolean",
+            "الشروط if / else": "ما ناتج 18 > 18؟¦false¦true¦خطأ؛؛ ما ناتج 5 >= 5؟¦true¦false¦خطأ؛؛ كم كتلة تُنفَّذ من if/else في المرة الواحدة؟¦واحدة فقط¦كلتاهما دائما¦لا شيء؛؛ أين تُكتب الأوامر التي تُنفَّذ عند تحقق الشرط؟¦داخل { } بعد if¦بعد else فقط¦قبل if؛؛ هل else يحتاج شرطا؟¦لا¦نعم دائما¦أحيانا فقط",
+            "الحلقات": "كم مرة يطبع for(let i=1;i<=3;i++)؟¦3¦2¦4؛؛ ما آخر قيمة تُطبع في for(let i=0;i<3;i++)؟¦2¦3¦0؛؛ أي جزء من for يزيد العداد؟¦الثالث¦الأول¦الثاني؛؛ ماذا يحدث إذا كان الشرط دائما صحيحا؟¦تدور الحلقة للأبد¦تدور مرة واحدة¦لا تعمل؛؛ تبدأ حلقة العد بكلمة:¦for¦loop¦repeat",
+            "الدوال": "ماذا ترجع add(1,2) إذا كانت return a + b؟¦3¦12¦1؛؛ ما فائدة الدالة؟¦إعادة استخدام مجموعة أوامر¦تغيير لون الصفحة¦حذف المتغيرات؛؛ ما يدخل بين قوسي الدالة عند تعريفها يسمى:¦مدخلات (parameters)¦نتائج¦تعليقات؛؛ ماذا يحدث بعد تنفيذ return؟¦تنتهي الدالة¦تكمل الدالة¦تبدأ من جديد؛؛ كيف نشغّل الدالة؟¦باستدعائها باسمها وقوسين¦بكتابة اسمها فقط¦بحذفها",
+            "المصفوفات": "كم عنصرا في [\"a\",\"b\",\"c\"]؟¦3¦2¦4؛؛ ما رقم آخر عنصر في مصفوفة من 4 عناصر؟¦3¦4¦1؛؛ ماذا يعطي arr[1] في [\"a\",\"b\",\"c\"]؟¦b¦a¦c؛؛ ماذا يعطي arr[5] إذا كان طولها 3؟¦undefined¦0¦c؛؛ ماذا تفعل push؟¦تضيف عنصرا في النهاية¦تضيف عنصرا في البداية¦تحذف آخر عنصر",
+            "الكائنات Objects": "كيف نقرأ city من user؟¦user.city¦user->city¦user(city)؛؛ ماذا يسمى name في { name: \"Ali\" }؟¦مفتاح (key)¦دالة¦مصفوفة؛؛ ما الذي يفصل بين خاصيتين؟¦فاصلة ,¦نقطتان :¦فاصلة منقوطة ;؛؛ ماذا تفعل user.age = 25 إذا كانت age موجودة؟¦تغيّر قيمتها¦تحذفها¦تسبب خطأ؛؛ بأي قوسين يُكتب الكائن؟¦{ }¦[ ]¦( )",
+            "العوامل الحسابية والمنطقية": "ما ناتج 7 % 2؟¦1¦3¦0؛؛ ما ناتج true && false؟¦false¦true¦خطأ؛؛ ما ناتج false || true؟¦true¦false¦خطأ؛؛ ما ناتج !true؟¦false¦true¦0؛؛ ما ناتج 2 + 3 * 4؟¦14¦20¦24",
+            "حلقة while": "متى تتوقف while؟¦عندما يصبح الشرط false¦بعد 10 مرات دائما¦لا تتوقف أبدا؛؛ كم مرة تدور: let i=1; while(i<3){ i++ }؟¦2¦3¦1؛؛ ما الفرق بين while و for؟¦while تكتفي بالشرط والعداد خارجها¦while لا تكرر¦for لا تحتاج شرطا؛؛ ماذا لو كان الشرط false من البداية؟¦لا تُنفَّذ أي مرة¦تُنفَّذ مرة¦خطأ؛؛ ما آخر قيمة تُطبع في while(i<=3) بدءا من i=1؟¦3¦4¦2",
+            "المشروع الختامي: حاسبة التقديرات": "ماذا ترجع grade(95) في مثال الدرس؟¦A¦B¦C؛؛ ماذا ترجع grade(80)؟¦B¦A¦C؛؛ ماذا ترجع grade(10)؟¦C¦A¦B؛؛ لماذا نستخدم else if؟¦لفحص شرط آخر إذا فشل الأول¦لتكرار الأمر¦لتعريف متغير؛؛ ما فائدة الحلقة مع المصفوفة؟¦المرور على كل عنصر¦حذف العناصر¦تغيير النوع",
+            "HTML: هيكل الصفحة": "أي وسم يُوضع بداخله المحتوى المرئي؟¦body¦head¦title؛؛ ما فائدة DOCTYPE؟¦إخبار المتصفح بإصدار HTML¦تغيير الألوان¦إضافة صورة؛؛ أين يظهر محتوى title؟¦تبويب المتصفح¦داخل الصفحة¦أسفل الصفحة؛؛ أي وسم يحتوي الصفحة كلها؟¦html¦body فقط¦head فقط؛؛ كيف يُكتب وسم إغلاق h1؟¦بسلاش قبل الاسم¦بنقطة¦لا يُغلق",
+            "HTML: العناوين والفقرات والتنسيق": "كم مستوى للعناوين في HTML؟¦6¦3¦10؛؛ أي وسم لا يحتاج إغلاقا؟¦br¦p¦strong؛؛ ما الفرق بين strong و em؟¦الأول عريض والثاني مائل¦الأول مائل والثاني عريض¦لا فرق؛؛ أي وسم يُستخدم للفقرة؟¦p¦para¦text؛؛ كيف نجعل نصا عريضا؟¦نضعه بين strong¦نضعه بين em¦نضعه بين br؛؛ أي عنوان أصغر حجما؟¦h5¦h2¦متساويان؛؛ هل يوجد وسم h7؟¦لا¦نعم¦أحيانا",
+            "HTML: الروابط والصور": "كيف تُكتب الصورة؟¦img مع src¦image مع href¦picture مع link؛؛ أي خاصية تحدد وجهة الرابط؟¦href¦src¦alt؛؛ ما الذي يظهر للمستخدم كنص الرابط؟¦الكلام بين وسمي a¦قيمة href¦قيمة alt؛؛ لماذا نكتب alt؟¦لوصف الصورة عند تعذرها وللمكفوفين¦لتكبيرها¦لتغيير لونها؛؛ أي وسم يمثل الرابط؟¦a¦link¦href",
+            "HTML: القوائم": "أي وسم لعنصر القائمة؟¦li¦ul¦ol؛؛ أي قائمة تُظهر أرقاما؟¦ol¦ul¦li؛؛ ماذا يوجد داخل ul؟¦عناصر li¦عناصر td¦عناصر tr؛؛ هل المسافات قبل li تغيّر الشكل؟¦لا¦نعم دائما¦أحيانا؛؛ ما معنى ul؟¦Unordered List¦Ultra Link¦Upper Line",
+            "HTML: الجداول": "أي وسم لخلية العنوان؟¦th¦td¦tr؛؛ أي وسم للصف؟¦tr¦td¦th؛؛ أين توضع td؟¦داخل tr¦خارج table¦داخل head؛؛ كم td في صف فيه 3 أعمدة؟¦3¦1¦6؛؛ أي وسم يحيط بالجدول؟¦table¦grid¦tab",
+            "HTML: النماذج Forms": "أي type لحقل كلمة السر؟¦password¦hidden¦text؛؛ ما وظيفة for في label؟¦ربطه بـ id الحقل¦تغيير لون الحقل¦إخفاء الحقل؛؛ ما وسم القائمة المنسدلة؟¦select¦dropdown¦list؛؛ أي type للزر الذي يرسل النموذج؟¦submit¦send¦go؛؛ هل input يحتاج وسم إغلاق؟¦لا¦نعم¦أحيانا",
+            "HTML: الوسوم الدلالية والمشروع الختامي": "ما الوسم الدلالي لرأس الصفحة؟¦header¦top¦start؛؛ أي وسم للتنقل؟¦nav¦menu¦go؛؛ كم مرة يظهر main في الصفحة؟¦مرة واحدة¦مرات كثيرة¦لا يظهر؛؛ ما فائدة الوسوم الدلالية؟¦توضّح معنى الأقسام¦تغيّر الألوان¦تسرّع الإنترنت؛؛ أي وسم لتذييل الصفحة؟¦footer¦bottom¦end",
+            "CSS: المحددات والربط": "ماذا يستهدف .box؟¦عناصر class=\"box\"¦عنصرا id=\"box\"¦وسم box؛؛ ماذا يستهدف #main؟¦عنصرا id=\"main\"¦كل الفقرات¦class=\"main\"؛؛ كيف تنتهي كل خاصية؟¦بفاصلة منقوطة ;¦بنقطتين¦بسلاش؛؛ ما الفاصل بين الخاصية وقيمتها؟¦نقطتان :¦فاصلة ,¦نقطة .؛؛ أي قوسين تحيط بالتنسيقات؟¦{ }¦[ ]¦( )",
+            "CSS: الألوان والخطوط": "ما وحدة px؟¦بكسل¦نسبة مئوية¦سنتيمتر؛؛ أي خاصية للون الخلفية؟¦background-color¦bg¦back؛؛ ما لون #ff0000؟¦أحمر¦أزرق¦أخضر؛؛ أي خاصية لنوع الخط؟¦font-family¦font-type¦text-font؛؛ ما قيمة text-align للتوسيط؟¦center¦middle¦mid",
+            "CSS: الـ Box Model": "أي مسافة داخل الحد؟¦padding¦margin¦border؛؛ أي مسافة خارج الحد؟¦margin¦padding¦width؛؛ ما ترتيب الصندوق من الداخل للخارج؟¦محتوى ثم padding ثم border ثم margin¦margin ثم border ثم padding¦border ثم margin ثم padding؛؛ أي خاصية تدوّر الزوايا؟¦border-radius¦corner¦round؛؛ ماذا يعني solid؟¦خط متصل¦خط منقط¦بدون خط",
+            "CSS: Flexbox": "ما فائدة gap؟¦مسافة بين العناصر¦لون الخلفية¦حجم الخط؛؛ أي قيمة تضع العناصر فوق بعض؟¦flex-direction: column¦flex-direction: row¦flex-wrap: nowrap؛؛ ما وظيفة align-items؟¦المحاذاة الرأسية¦المحاذاة الأفقية¦الحجم؛؛ ما وظيفة justify-content؟¦توزيع العناصر أفقيا¦تغيير اللون¦تدوير الزوايا؛؛ ما معنى space-between؟¦مسافة متساوية بين العناصر¦لا مسافات¦مسافة على الأطراف فقط",
+            "CSS: التجاوب والوحدات": "ماذا تعني max-width: 600px؟¦الشاشات حتى 600 بكسل¦الشاشات فوق 600¦عرض ثابت؛؛ ماذا يعني width: 50%؟¦نصف عرض الحاوي¦نصف الشاشة دائما¦50 بكسل؛؛ rem نسبة إلى:¦حجم خط الصفحة الأساسي¦عرض الشاشة¦ارتفاع الشاشة؛؛ بأي كلمة تبدأ media query؟¦@media¦media¦#media؛؛ لماذا التجاوب مهم؟¦لتناسب الصفحة كل الشاشات¦لتغيير اللغة¦لتسريع الاتصال",
+            "CSS: المشروع الختامي (متغيرات + دارك مود)": "كيف نعرّف متغير CSS؟¦--name: value¦var name = value¦$name: value؛؛ أين تُعرَّف المتغيرات العامة؟¦:root¦body فقط¦head؛؛ ماذا تفعل var(--bg)؟¦تقرأ قيمة المتغير¦تعرّف متغيرا¦تحذف متغيرا؛؛ ما فائدة transition؟¦تغيير ناعم¦تغيير اللون¦إخفاء العنصر؛؛ متى يعمل :hover؟¦عند وقوف الماوس على العنصر¦عند تحميل الصفحة¦عند إغلاقها"
+        };
+        L.forEach(l => {
+            l.k = l.k || "js";
+            const q = Q[l.t];
+            if (q) l.q = l.q.concat(q.split("؛؛").map(x => {
+                const a = x.split("¦");
+                return [a[0].trim(), a.slice(1), 0]
+            }))
+        });
+        L.sort((a, b) => ORD.indexOf(a.k) - ORD.indexOf(b.k));
+        let S;
+        try {
+            S = JSON.parse(localStorage.getItem("dama2") || "null")
+        } catch (e) {}
+        if (!S) {
+            let o = null;
+            try {
+                o = JSON.parse(localStorage.getItem("dama") || "null")
+            } catch (e) {}
+            S = {
+                name: o && o.name ? o.name : "",
+                done: 0,
+                recs: []
+            }
+        }
+        const save = () => {
+            try {
+                localStorage.setItem("dama2", JSON.stringify(S))
+            } catch (e) {}
+        };
+        let ord = [],
+            cur = null,
+            step = 0,
+            ex = {},
+            pr = {},
+            t0 = 0,
+            tries = 0,
+            fails = 0,
+            sent = false;
+        const $ = h => document.getElementById("app").innerHTML = h;
+        const wa = m => "https://wa.me/" + PH + "?text=" + encodeURIComponent(m);
+        const fmt = s => Math.floor(s / 60) + " د " + (s % 60) + " ث";
+
+        function home() {
+            cur = null;
+            let h = `<h1><span>DAMA</span> code</h1><p class="mu">كورس HTML ثم CSS ثم JavaScript — الدرس التالي لا يُفتح إلا بعد إرسال تقريرك على واتساب.</p>`;
+            if (!S.name) h += `<div class="card"><b>اسم الطالب</b><div class="input-container"><input class="input" id="nm" name="text" type="text" placeholder="اكتب اسمك"></div><div class="wt-wrap"><label class="water-toggle"><input type="checkbox" id="toggle-wave" onchange="var c=this;setTimeout(function(){if(!nm())c.checked=false},700)"><div class="container"><button class="water-button" type="button">كمل</button><svg style="position:absolute;width:0;height:0"><filter id="water-rotate"><feTurbulence result="turbulence" seed="2" numOctaves="2" baseFrequency="0.0075 0.0075" type="turbulence"></feTurbulence><feComponentTransfer><feFuncR type="table"><animateTransform repeatCount="indefinite" dur="10s" values="0.01;0.02;0.01" attributeName="transform"></animateTransform></feFuncR></feComponentTransfer><feDisplacementMap yChannelSelector="G" xChannelSelector="R" scale="17.5" in2="turbulence" in="SourceGraphic"></feDisplacementMap></filter><filter id="still-water"><feTurbulence result="turbulence" seed="2" numOctaves="2" baseFrequency="0.0075 0.0075" type="turbulence"></feTurbulence><feComponentTransfer><feFuncR type="table"><animateTransform repeatCount="indefinite" dur="10s" values="0.01;0.02;0.01" attributeName="transform"></animateTransform></feFuncR></feComponentTransfer><feDisplacementMap yChannelSelector="G" xChannelSelector="R" scale="12.5" in2="turbulence" in="SourceGraphic"></feDisplacementMap></filter></svg></div></label></div></div>`;
+            else {
+                h += `<div class="bar"><i style="width:${S.done/L.length*100}%"></i></div><p class="mu">أهلا ${S.name} — أنجزت ${S.done} من ${L.length}</p>`;
+                L.forEach((l, i) => {
+                    const o = i < S.done,
+                        a = i == S.done;
+                    if (!i || L[i - 1].k != l.k) h += `<h3>${GN[l.k]}</h3>`;
+                    h += `<div class="card row"><div>${i+1}. ${l.t}<div class="mu">${o?"✅ مكتمل":a?"متاح الآن":"🔒 مقفل"}</div></div>${fx(o?"مراجعة":"ابدأ","open_("+i+")",a||o?"":"disabled")}</div>`
+                });
+                if (S.done >= L.length) h += `<div class="card"><b class="ok">🎉 أنهيت الكورس!</b><br><a href="${wa(final())}" target="_blank"><button>إعادة إرسال التقرير النهائي</button></a></div>`
+            }
+            $(h)
+        }
+
+        function nm() {
+            const v = document.getElementById("nm").value.trim();
+            if (v.split(/\s+/).length < 2) {
+                alert("اكتب اسمك الثنائي على الأقل");
+                return false
+            }
+            S.name = v;
+            save();
+            home();
+            return true
+        }
+        const shuf = a => a.sort(() => Math.random() - .5);
+
+        function open_(i) {
+            cur = i;
+            ord = L[i].q.map(q => shuf(q[1].map((_, j) => j)));
+            step = 0;
+            ex = {};
+            pr = {};
+            tries = 0;
+            fails = 0;
+            sent = false;
+            draw()
+        }
+
+        function draw() {
+            const l = L[cur],
+                ss = ["الشرح", "الامتحان", "التطبيق", "الإرسال"];
+            let h = `<button class="g" onclick="home()">← الرئيسية</button><h2>الدرس ${cur+1}: ${l.t}</h2><p class="mu">${ss.map((s,i)=>i==step?`<b>${s}</b>`:s).join(" ← ")}</p><div class="card">`;
+            if (step == 0) h += l.x + tbl(E[l.t], T[l.t]) + `<p class="mu">الضغط على «التالي» يبدأ الامتحان ويبدأ العد.</p>${fx("التالي","go(1)")}`;
+            if (step == 1) {
+                h += `<p class="mu">الشروط: نجاح بـ 100٪ من الأسئلة، ولا يوجد حد للوقت (يُسجَّل وقتك فقط). كل محاولة خاطئة تُسجَّل وتُخصم من درجتك.</p>`;
+                l.q.forEach((q, i) => {
+                    h += `<p><b>${i+1}) ${esc(q[0])}</b></p>` + ord[i].map(j => {
+                        const o = q[1][j];
+                        return `<label class="l ${ex[i]===j?"s":""}"><input type="radio" style="width:auto" name="q${i}" ${ex[i]===j?"checked":""} onclick="ex[${i}]=${j};draw()"> ${esc(o)}</label>`
+                    }).join("")
+                });
+                h += `${fx("تسليم","chkEx()")}<div id="msg"></div>`
+            }
+            if (step == 2) {
+                h += `<p><b>المطلوب:</b> ${l.p}</p><p class="mu">الشروط (كلها إلزامية، ولا يوجد حد للوقت):</p><ul>${l.c.map(c=>`<li>${c[0]}</li>`).join("")}</ul><textarea id="code" placeholder="اكتب الكود هنا" oninput="pr.code=this.value">${pr.code||""}</textarea>${fx("تسليم","chkPr()")}<div id="msg"></div>`
+            }
+            if (step == 3) {
+                const g = grade();
+                h += `<p>وقت الامتحان: <b>${fmt(pr.et)}</b> — محاولات الامتحان: <b>${tries}</b><br>وقت التطبيق: <b>${fmt(pr.pt)}</b><br>درجة الامتحان: <b>${g.e}/40</b> — التطبيق: <b>${g.p}/60</b> — المجموع: <b>${g.t}/100</b></p><b>تقييمك لنفسك (1-5)</b><select id="rt"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option></select><b>ملاحظة (اختياري)</b><input id="nt"><p class="mu">سيفتح واتساب برسالة جاهزة، اضغط إرسال هناك.</p>${fx("إرسال","send()")}${sent?`<p class="ok">بعد الضغط على «إرسال» داخل واتساب أكد هنا:</p>${fx("التالي","fin()")}`:""}`
+            }
+            $(h + "</div>")
+        }
+
+        function fx(l, oc, x) {
+            return '<button class="fx" ' + (x || "") + ' onclick="' + oc + '">' + l + '<div class="clip"><div class="corner lT"></div><div class="corner rB"></div><div class="corner rT"></div><div class="corner lB"></div></div><span class="arrow rA"></span><span class="arrow lA"></span></button>'
+        }
+
+        function go(s) {
+            step = s;
+            t0 = Date.now();
+            draw()
+        }
+
+        function chkEx() {
+            const l = L[cur];
+            if (Object.keys(ex).length < l.q.length) return msg("أجب عن كل الأسئلة", "bad");
+            const el = (Date.now() - t0) / 1e3;
+            tries++;
+            const w = l.q.filter((q, i) => ex[i] !== q[2]).length;
+            if (w) {
+                fails++;
+                ex = {};
+                msg("❌ " + w + " إجابات خاطئة. أعد المحاولة (المحاولات الخاطئة: " + fails + ")", "bad");
+                setTimeout(draw, 1800);
+                return
+            }
+            pr.et = Math.round((Date.now() - t0) / 1e3);
+            go(2)
+        }
+
+        function chkPr() {
+            const l = L[cur],
+                code = pr.code || "",
+                el = (Date.now() - t0) / 1e3;
+            const bad = l.c.filter(c => !c[1].test(code));
+            let out = [];
+            if (code.split("\n").filter(x => x.trim()).length < 2) out.push("الكود أقصر من سطرين");
+            if (!bal(code, l.k)) out.push("الكود غير متوازن: تأكد من إغلاق كل وسم أو قوس");
+            bad.forEach(c => out.push("ناقص: " + c[0]));
+            if (out.length) return msg("❌ مرفوض:<br>" + out.join("<br>"), "bad");
+            pr.pt = Math.round(el);
+            pr.bad = 0;
+            go(3)
+        }
+
+        function bal(c, k) {
+            if (k == "html") {
+                const v = ["br", "img", "input", "meta", "hr", "link"],
+                    st = [],
+                    re = /<(\/?)([a-zA-Z0-9]+)[^>]*>/g;
+                let m;
+                while (m = re.exec(c)) {
+                    const n = m[2].toLowerCase();
+                    if (v.includes(n)) continue;
+                    if (m[1]) {
+                        if (st.pop() !== n) return false
+                    } else st.push(n)
+                }
+                return !st.length
+            }
+            const st = [],
+                pr = {
+                    ")": "(",
+                    "]": "[",
+                    "}": "{"
+                };
+            let q = null;
+            for (const ch of c) {
+                if (q) {
+                    if (ch == q) q = null;
+                    continue
+                }
+                if ("\"'`".includes(ch)) {
+                    q = ch;
+                    continue
+                }
+                if ("([{".includes(ch)) st.push(ch);
+                else if (pr[ch] && st.pop() !== pr[ch]) return false
+            }
+            return !st.length && !q
+        }
+
+        function grade() {
+            const e = Math.max(0, 40 - fails * 10),
+                p = 60;
+            return {
+                e,
+                p,
+                t: e + p
+            }
+        }
+
+        function msg(m, c) {
+            document.getElementById("msg").innerHTML = `<p class="${c}">${m}</p>`
+        }
+
+        function report() {
+            const l = L[cur],
+                g = grade(),
+                code = pr.code || "";
+            return `📚 DAMA code — تقرير الدرس ${cur+1}: ${l.t}\n👤 الطالب: ${S.name}\n⏱ وقت الامتحان: ${fmt(pr.et)} (محاولات خاطئة: ${fails})\n⏱ وقت التطبيق: ${fmt(pr.pt)}\n📝 درجة الامتحان: ${g.e}/40\n💻 درجة التطبيق: ${g.p}/60\n🏆 المجموع: ${g.t}/100 ${g.t>=PASS?"(ناجح)":"(راسب)"}\n⭐ تقييمي لنفسي: ${document.getElementById("rt").value}/5\n🗒 ملاحظة: ${document.getElementById("nt").value||"-"}\n\n📄 الكود الذي كتبته:\n${code}`
+        }
+
+        function final() {
+            const t = S.recs.reduce((a, r) => a + r.t, 0);
+            return `🎓 ${S.name} أنهى كورس DAMA code بالكامل!\nعدد الدروس: ${L.length}\nمتوسط الدرجات: ${Math.round(t/(S.recs.length||1))}/100`
+        }
+
+        function send() {
+            const g = grade();
+            if (g.t < PASS) return alert("درجتك أقل من " + PASS + "، أعد الدرس.");
+            window.open(wa(report()), "_blank");
+            sent = true;
+            draw()
+        }
+
+        function fin() {
+            const g = grade();
+            if (cur == S.done) {
+                S.recs.push({
+                    t: g.t
+                });
+                S.done++;
+                save();
+                if (S.done >= L.length) {
+                    window.open(wa(final()), "_blank")
+                }
+            }
+            home()
+        }
+
+        function curTheme() {
+            return document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+        }
+
+        function tgl(cb) {
+            const n = cb.checked ? "dark" : "light";
+            document.documentElement.dataset.theme = n;
+            try {
+                localStorage.setItem("dama-theme", n)
+            } catch (e) {}
+        }
+        try {
+            const t = localStorage.getItem("dama-theme");
+            if (t) document.documentElement.dataset.theme = t
+        } catch (e) {}
+        document.getElementById("tgc").checked = curTheme() == "dark";
+        home();
+    </script>
+</body>
+
+</html>
